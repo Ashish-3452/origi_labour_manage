@@ -75,9 +75,9 @@ app.use('/api/activity', require('./routes/activityRoutes'));
 
 
 
-// Frontend fallback - SABSE LAST me
+// Frontend fallback (SPA)
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, '../../frontend/client/build/index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Error handler
