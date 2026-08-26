@@ -1,0 +1,11 @@
+{
+  "name": "labourbhai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Labour Management System",
+  "main": "backend/server/server.js",
+  "scripts": {
+    "start": "node backend/server/server.js",
+    "dev": "nodemon backend/server/server.js"
+  }
+}
