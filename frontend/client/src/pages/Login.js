@@ -3,32 +3,47 @@ import {
   Box, Card, CardContent, TextField, Button, Typography,
   Alert, InputAdornment, IconButton, CircularProgress
 } from '@mui/material';
-import { Visibility, VisibilityOff, Engineering } from '@mui/icons-material';
+import { Engineering, ArrowBack } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { authAPI } from '../services/api';
+import api from '../services/api';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ mobile: '', password: '' });
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [step, setStep] = useState(1); // 1=mobile, 2=otp
+  const [mobile, setMobile] = useState('');
+  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
-  };
-
-  const handleSubmit = async (e) => {
+  const handleRequestOtp = async (e) => {
     e.preventDefault();
-    
-    if (!formData.mobile || !formData.password) {
-      setError('Please fill all fields');
+    if (mobile.length !== 10) {
+      setError('Valid 10-digit mobile number required');
       return;
     }
 
-    if (formData.mobile.length !== 10) {
-      setError('Mobile number must be 10 digits');
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const res = await api.post('/otp/request', { mobile });
+      if (res.data.success) {
+        setStep(2);
+        setSuccess('OTP sent to your mobile!');
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to send OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    if (otp.length !== 6) {
+      setError('Enter 6-digit OTP');
       return;
     }
 
@@ -36,23 +51,14 @@ const Login = () => {
     setError('');
 
     try {
-      // 🔥 REAL API CALL - Backend se connect
-      const response = await authAPI.login(formData.mobile, formData.password);
-      
-      if (response.data.success) {
-        const { token, user } = response.data;
-        
-        // Token aur user data localStorage me save karo
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        
-        // Dashboard pe le jao
+      const res = await api.post('/otp/verify', { mobile, otp });
+      if (res.data.success) {
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
         navigate('/dashboard');
       }
     } catch (err) {
-      // Agar error aaye to message dikhao
-      const errorMsg = err.response?.data?.error || 'Login failed. Please try again.';
-      setError(errorMsg);
+      setError(err.response?.data?.error || 'Invalid OTP');
     } finally {
       setLoading(false);
     }
@@ -60,105 +66,67 @@ const Login = () => {
 
   return (
     <Box sx={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
+      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
       background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #01579b 100%)',
       padding: 2
     }}>
-      <Card sx={{ maxWidth: 420, width: '90%', mx: 'auto', borderRadius: 4, boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+      <Card sx={{ maxWidth: 420, width: '90%', borderRadius: 4, boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
         <CardContent sx={{ padding: 4 }}>
           
-          {/* Logo & Title */}
           <Box sx={{ textAlign: 'center', mb: 4 }}>
             <Box sx={{
               width: 80, height: 80, borderRadius: '50%',
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto 15px', boxShadow: '0 8px 25px rgba(102,126,234,0.4)'
+              margin: '0 auto 15px'
             }}>
               <Engineering sx={{ fontSize: 40, color: 'white' }} />
             </Box>
             <Typography variant="h5" fontWeight="bold" color="#1a237e">
-              Labour Management
+              {step === 1 ? 'Login' : 'Enter OTP'}
             </Typography>
             <Typography variant="body2" color="text.secondary" mt={1}>
-              Ashish Contractor System
+              {step === 1 ? 'Labour Management System' : `Sent to ${mobile}`}
             </Typography>
           </Box>
 
-          {/* Error Alert */}
-          {error && (
-            <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
-              {error}
-            </Alert>
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+
+          {step === 1 && (
+            <form onSubmit={handleRequestOtp}>
+              <TextField
+                fullWidth label="Mobile Number" type="tel"
+                value={mobile} onChange={(e) => setMobile(e.target.value)}
+                margin="normal" required
+                inputProps={{ maxLength: 10 }}
+                placeholder="Enter 10 digit mobile"
+              />
+              <Button type="submit" fullWidth variant="contained" size="large"
+                disabled={loading} sx={{ mt: 3, py: 1.5, borderRadius: 2 }}>
+                {loading ? <CircularProgress size={24} color="inherit" /> : '📱 Get OTP'}
+              </Button>
+            </form>
           )}
 
-          {/* Login Form */}
-          <form onSubmit={handleSubmit}>
-            <TextField
-              fullWidth
-              label="Mobile Number"
-              name="mobile"
-              type="tel"
-              value={formData.mobile}
-              onChange={handleChange}
-              margin="normal"
-              required
-              inputProps={{ maxLength: 10 }}
-              placeholder="Enter 10 digit mobile number"
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
-            />
-
-            <TextField
-              fullWidth
-              label="Password"
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              value={formData.password}
-              onChange={handleChange}
-              margin="normal"
-              required
-              placeholder="Enter your password"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
-            />
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              size="large"
-              disabled={loading}
-              sx={{
-                mt: 3, mb: 2, py: 1.5, borderRadius: 2,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                fontSize: '1rem', fontWeight: 'bold',
-                '&:hover': { boxShadow: '0 8px 25px rgba(102,126,234,0.5)' }
-              }}
-            >
-              {loading ? <CircularProgress size={24} color="inherit" /> : '🔐 Login'}
-            </Button>
-          </form>
-
-          {/* Demo Credentials */}
-          <Box sx={{ mt: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 2, textAlign: 'center' }}>
-            <Typography variant="caption" color="text.secondary" display="block">
-              🧪 Demo Credentials
-            </Typography>
-            <Typography variant="body2" fontWeight="bold" color="#1a237e">
-              📱 9876543210 | 🔑 admin123
-            </Typography>
-          </Box>
+          {step === 2 && (
+            <form onSubmit={handleVerifyOtp}>
+              <TextField
+                fullWidth label="6-Digit OTP" type="number"
+                value={otp} onChange={(e) => setOtp(e.target.value)}
+                margin="normal" required
+                inputProps={{ maxLength: 6 }}
+                placeholder="Enter OTP"
+              />
+              <Button type="submit" fullWidth variant="contained" size="large"
+                disabled={loading} sx={{ mt: 3, py: 1.5, borderRadius: 2 }}>
+                {loading ? <CircularProgress size={24} color="inherit" /> : '✅ Verify & Login'}
+              </Button>
+              <Button fullWidth onClick={() => setStep(1)} sx={{ mt: 1 }}>
+                <ArrowBack sx={{ mr: 1 }} /> Change Number
+              </Button>
+            </form>
+          )}
 
         </CardContent>
       </Card>

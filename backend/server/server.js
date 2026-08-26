@@ -17,7 +17,7 @@ const Expense = require('./models/Expense');
 const ThekaWork = require('./models/ThekaWork');
 const ActivityLog = require('./models/ActivityLog');
 const errorHandler = require('./middleware/errorHandler');
-
+const Otp = require('./models/Otp');
 // Load environment variables
 dotenv.config();
 
@@ -72,7 +72,7 @@ app.use('/api/profit', require('./routes/profitRoutes'));
 app.use('/api/bill', require('./routes/billRoutes'));
 app.use('/api/theka', require('./routes/thekaRoutes'));
 app.use('/api/activity', require('./routes/activityRoutes'));
-
+app.use('/api/otp', require('./routes/otpRoutes'));
 
 
 // Frontend fallback (SPA)
@@ -103,6 +103,7 @@ const startServer = async () => {
       await Expense.createTable();
       await ThekaWork.createTable();
       await ActivityLog.createTable();
+      await Otp.createTable();
       
       console.log('📦 Inserting default data...');
       await Site.createDefault();
