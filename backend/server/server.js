@@ -55,6 +55,8 @@ app.get('/api/test', (req, res) => {
 // Login limiter
 app.use('/api/auth/login', loginLimiter);
 
+// Serve Frontend from public folder
+app.use(express.static(path.join(__dirname, 'public')));
 // API Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/labour', require('./routes/labourRoutes'));
