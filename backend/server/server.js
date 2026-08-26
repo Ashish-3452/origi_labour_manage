@@ -25,6 +25,8 @@ const app = express();
 
 // Security
 app.use(helmet());
+// Trust proxy for Hostinger
+app.set('trust proxy', 1);
 
 // CORS
 app.use(cors({
