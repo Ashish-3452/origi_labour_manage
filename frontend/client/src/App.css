@@ -1,0 +1,104 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', 'Arial', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* ========================================
+   MOBILE RESPONSIVE GLOBAL FIXES
+   ======================================== */
+
+@media (max-width: 600px) {
+  /* Touch-friendly buttons */
+  button, .MuiButtonBase-root {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  
+  /* Prevent iOS zoom on inputs */
+  input, select, textarea, .MuiInputBase-input {
+    font-size: 16px !important;
+  }
+  
+  /* Smaller table cells */
+  .MuiTableCell-root {
+    padding: 6px 4px !important;
+    font-size: 0.75rem !important;
+  }
+  
+  /* Full-width cards */
+  .MuiCard-root {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Smaller alerts */
+  .MuiAlert-root {
+    font-size: 0.8rem !important;
+    padding: 6px 12px !important;
+  }
+  
+  /* Dialog full screen */
+  .MuiDialog-paper {
+    margin: 8px !important;
+    max-height: calc(100% - 16px) !important;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.3s ease-in-out; }
+
+/* Print styles */
+@media print {
+  .MuiDrawer-root, .MuiAppBar-root { display: none !important; }
+  .MuiBox-root main { margin-left: 0 !important; width: 100% !important; }
+}
