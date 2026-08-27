@@ -4,7 +4,6 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import './App.css';
 import LabourRegistration from './pages/LabourRegistration';
 import LabourList from './pages/LabourList';
 import MarkAttendance from './pages/MarkAttendance';
@@ -20,9 +19,8 @@ import SiteManagement from './pages/SiteManagement';
 import CategoryManagement from './pages/CategoryManagement';
 import ActivityLog from './pages/ActivityLog';
 import Settings from './pages/Settings';
-
-
-
+import ProtectedRoute from './components/ProtectedRoute';
+import './App.css';
 
 const theme = createTheme({
   palette: {
@@ -42,29 +40,108 @@ function App() {
       <CssBaseline />
       <Router>
         <Routes>
+          {/* Public route */}
           <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="*" element={<Navigate to="/" />} />
-          <Route path="/labour/register" element={<LabourRegistration />} />
-<Route path="/labour/list" element={<LabourList />} />
-<Route path="/attendance/mark" element={<MarkAttendance />} />
-<Route path="/payments/advance" element={<AdvancePayment />} />
-<Route path="/khoraki" element={<KhorakiManagement />} />
-<Route path="/supervisors" element={<SupervisorManagement />} />
-<Route path="/expenses" element={<ExpenseManagement />} />
-<Route path="/profit" element={<ProfitDashboard />} />
-<Route path="/bills" element={<BillGeneration />} />
-<Route path="/theka" element={<ThekaWork />} />
-<Route path="/users" element={<UserManagement />} />
-<Route path="/sites" element={<SiteManagement />} />
-<Route path="/categories" element={<CategoryManagement />} />
-<Route path="/activity" element={<ActivityLog />} />
-<Route path="/settings" element={<Settings />} />
 
+          {/* Protected routes */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
 
+          <Route path="/labour/register" element={
+            <ProtectedRoute>
+              <LabourRegistration />
+            </ProtectedRoute>
+          } />
 
+          <Route path="/labour/list" element={
+            <ProtectedRoute>
+              <LabourList />
+            </ProtectedRoute>
+          } />
 
+          <Route path="/attendance/mark" element={
+            <ProtectedRoute>
+              <MarkAttendance />
+            </ProtectedRoute>
+          } />
 
+          <Route path="/payments/advance" element={
+            <ProtectedRoute>
+              <AdvancePayment />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/khoraki" element={
+            <ProtectedRoute>
+              <KhorakiManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/supervisors" element={
+            <ProtectedRoute>
+              <SupervisorManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/expenses" element={
+            <ProtectedRoute>
+              <ExpenseManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/profit" element={
+            <ProtectedRoute>
+              <ProfitDashboard />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/bills" element={
+            <ProtectedRoute>
+              <BillGeneration />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/theka" element={
+            <ProtectedRoute>
+              <ThekaWork />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/users" element={
+            <ProtectedRoute>
+              <UserManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/sites" element={
+            <ProtectedRoute>
+              <SiteManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/categories" element={
+            <ProtectedRoute>
+              <CategoryManagement />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/activity" element={
+            <ProtectedRoute>
+              <ActivityLog />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          } />
+
+          {/* Catch-all - should be last */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </ThemeProvider>
