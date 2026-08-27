@@ -58,7 +58,8 @@ app.get('/api/test', (req, res) => {
 app.use('/api/auth/login', loginLimiter);
 
 // Serve Frontend from public folder
-app.use(express.static(path.join(__dirname, '../../frontend/client/build')));
+app.use(express.static(path.join(__dirname, 'public')));
+
 // API Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/labour', require('./routes/labourRoutes'));
@@ -77,9 +78,8 @@ app.use('/api/otp', require('./routes/otpRoutes'));
 
 // Frontend fallback (SPA)
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, '../../frontend/client/build/index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-
 // Error handler
 app.use(errorHandler);
 

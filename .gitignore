@@ -1,9 +1,7 @@
 node_modules/
 .env
+frontend/client/node_modules/
 frontend/client/build/
-dist/
-uploads/*
-!uploads/.gitkeep
+frontend/
 *.log
 .DS_Store
-*.zip
