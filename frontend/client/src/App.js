@@ -25,14 +25,36 @@ import './App.css';
 
 const theme = createTheme({
   palette: {
-    primary: { main: '#1a237e' },
-    secondary: { main: '#dc004e' },
-    success: { main: '#4caf50' },
-    warning: { main: '#ff9800' },
+    primary: { 
+      main: '#1a237e',
+      light: '#534bae',
+      dark: '#000051',
+      contrastText: '#ffffff'
+    },
+    secondary: { 
+      main: '#ff6f00',
+      light: '#ffa040',
+      dark: '#c43e00',
+      contrastText: '#ffffff'
+    },
+    success: { main: '#2e7d32' },
+    warning: { main: '#f57c00' },
+    error: { main: '#c62828' },
+    background: {
+      default: '#f0f2f5',
+      paper: '#ffffff'
+    }
   },
   typography: {
     fontFamily: '"Roboto", "Arial", sans-serif',
+    h4: { fontWeight: 700 },
+    h5: { fontWeight: 700 },
+    h6: { fontWeight: 600 },
+    button: { textTransform: 'none', fontWeight: 600 }
   },
+  shape: {
+    borderRadius: 8
+  }
 });
 
 function App() {

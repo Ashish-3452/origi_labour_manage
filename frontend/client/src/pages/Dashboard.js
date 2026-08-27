@@ -8,7 +8,7 @@ import {
   Dashboard as DashboardIcon, People, TrendingDown, Assignment, Payment,
   Restaurant, Settings, Menu as MenuIcon,
   Logout, Notifications, TrendingUp, Business, PersonAdd, Calculate, PictureAsPdf,
-  SupervisorAccount, Category, History,Assessment
+  SupervisorAccount, Category, History, Assessment
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -82,116 +82,219 @@ const Dashboard = () => {
   ];
 
   const drawer = (
-    <Box>
-      <Box sx={{ 
-        p: 2.5, textAlign: 'center',
-        background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 100%)',
-        color: 'white'
+    <Box sx={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      background: 'linear-gradient(180deg, #1a237e 0%, #0d47a1 100%)'
+    }}>
+      <Box sx={{
+        p: 2.5,
+        textAlign: 'center',
+        borderBottom: '1px solid rgba(255,255,255,0.1)'
       }}>
-        <Avatar sx={{ 
-          width: 60, height: 60, margin: '0 auto 10px',
-          bgcolor: 'white', color: '#1a237e', fontSize: 24, fontWeight: 'bold'
+        <Avatar sx={{
+          width: 60, height: 60,
+          margin: '0 auto 10px',
+          bgcolor: 'white',
+          color: '#1a237e',
+          fontSize: 24,
+          fontWeight: 'bold',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
         }}>
           {user?.name?.charAt(0) || 'A'}
         </Avatar>
-        <Typography variant="h6" fontWeight="bold">
+        <Typography variant="h6" fontWeight="bold" sx={{ color: 'white' }}>
           {user?.name || 'Admin'}
         </Typography>
-        <Typography variant="caption" sx={{ opacity: 0.9 }}>
+        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>
           {user?.role || 'SUPER_ADMIN'}
         </Typography>
       </Box>
 
-      <List sx={{ pt: 1, overflowY: 'auto', maxHeight: 'calc(100vh - 250px)' }}>
+      <List sx={{
+        flex: 1,
+        pt: 1,
+        overflowY: 'auto',
+        '&::-webkit-scrollbar': { width: '4px' }
+      }}>
         {menuItems.map((item) => (
-          <ListItem 
-            button 
+          <ListItem
+            button
             key={item.text}
             onClick={() => { navigate(item.path); setMobileOpen(false); }}
-            sx={{ mx: 1, my: 0.5, borderRadius: 2, '&:hover': { bgcolor: '#e3f2fd' } }}
+            sx={{
+              mx: 1,
+              my: 0.3,
+              borderRadius: 2,
+              color: 'rgba(255,255,255,0.85)',
+              '&:hover': {
+                bgcolor: 'rgba(255,255,255,0.15)',
+                color: 'white'
+              }
+            }}
           >
-            <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
+            <ListItemIcon sx={{ minWidth: 40, color: 'inherit' }}>
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText
+              primary={item.text}
+              primaryTypographyProps={{ fontSize: '0.9rem', fontWeight: 500 }}
+            />
           </ListItem>
         ))}
       </List>
 
-      <Divider sx={{ mx: 2 }} />
-
-      <List>
-        <ListItem button onClick={handleLogout}
-          sx={{ mx: 1, borderRadius: 2, '&:hover': { bgcolor: '#ffebee' } }}>
-          <ListItemIcon sx={{ minWidth: 40 }}><Logout color="error" /></ListItemIcon>
-          <ListItemText primary="Logout" sx={{ color: 'error.main' }} />
+      <Box sx={{ p: 1.5, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+        <ListItem
+          button
+          onClick={handleLogout}
+          sx={{
+            borderRadius: 2,
+            color: '#ffebee',
+            '&:hover': { bgcolor: 'rgba(255,0,0,0.2)' }
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 40, color: '#ff5252' }}>
+            <Logout />
+          </ListItemIcon>
+          <ListItemText primary="Logout" />
         </ListItem>
-      </List>
+      </Box>
     </Box>
   );
 
   return (
-    <Box sx={{ display: 'flex', bgcolor: '#f5f5f5', minHeight: '100vh' }}>
-      
-      <AppBar position="fixed" sx={{ 
-        width: { sm: `calc(100% - ${drawerWidth}px)` },
-        ml: { sm: `${drawerWidth}px` },
-        background: 'white', color: '#333', boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-      }}>
+    <Box sx={{ display: 'flex', bgcolor: '#f0f2f5', minHeight: '100vh' }}>
+
+      <AppBar
+        position="fixed"
+        sx={{
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          ml: { sm: `${drawerWidth}px` },
+          background: 'rgba(255,255,255,0.95)',
+          color: '#333',
+          boxShadow: '0 1px 10px rgba(0,0,0,0.08)',
+          backdropFilter: 'blur(10px)'
+        }}
+      >
         <Toolbar>
-          <IconButton color="inherit" edge="start" onClick={() => setMobileOpen(!mobileOpen)}
-            sx={{ mr: 2, display: { sm: 'none' } }}>
+          <IconButton
+            color="inherit"
+            edge="start"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            sx={{ mr: 2, display: { sm: 'none' } }}
+          >
             <MenuIcon />
           </IconButton>
-          
-          <Typography variant="h6" fontWeight="bold" 
-            sx={{ flexGrow: 1, fontSize: { xs: '0.9rem', sm: '1.25rem' } }}>
-            🏗️ {window.innerWidth < 600 ? 'LMS' : 'Labour Management System'}
+
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            sx={{
+              flexGrow: 1,
+              fontSize: { xs: '0.9rem', sm: '1.25rem' },
+              color: '#1a237e'
+            }}
+          >
+            🏗️ {window.innerWidth < 600 ? 'LMS' : 'LabourBhai'}
           </Typography>
 
-          <Typography variant="body2" 
-            sx={{ mr: 2, color: 'text.secondary', display: { xs: 'none', sm: 'block' } }}>
-            {currentTime.toLocaleDateString('hi-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+          <Typography
+            variant="body2"
+            sx={{
+              mr: 2,
+              color: 'text.secondary',
+              display: { xs: 'none', sm: 'block' }
+            }}
+          >
+            {currentTime.toLocaleDateString('hi-IN', {
+              day: 'numeric', month: 'long', year: 'numeric'
+            })}
           </Typography>
 
           <IconButton>
             <Badge badgeContent={stats.present_today || 0} color="success">
-              <Notifications />
+              <Notifications sx={{ color: '#1a237e' }} />
             </Badge>
           </IconButton>
         </Toolbar>
       </AppBar>
 
       <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
-        <Drawer variant="temporary" open={mobileOpen} onClose={() => setMobileOpen(false)}
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={() => setMobileOpen(false)}
           ModalProps={{ keepMounted: true }}
-          sx={{ display: { xs: 'block', sm: 'none' }, '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth } }}>
+          sx={{
+            display: { xs: 'block', sm: 'none' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+          }}
+        >
           {drawer}
         </Drawer>
-        <Drawer variant="permanent"
-          sx={{ display: { xs: 'none', sm: 'block' }, '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth } }} open>
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: 'none', sm: 'block' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+          }}
+          open
+        >
           {drawer}
         </Drawer>
       </Box>
 
-      <Box component="main" sx={{ 
-        flexGrow: 1, p: { xs: 1, sm: 2, md: 3 }, 
-        width: { sm: `calc(100% - ${drawerWidth}px)` }, mt: 8 
-      }}>
-        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: { xs: 1, sm: 2, md: 3 },
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          mt: 8
+        }}
+      >
+        <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
           {statsCards.map((stat, index) => (
             <Grid item xs={6} sm={6} md={3} key={index}>
-              <Card sx={{ 
-                borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                transition: 'transform 0.3s', '&:hover': { transform: 'translateY(-5px)' }
+              <Card sx={{
+                borderRadius: 3,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                transition: 'all 0.3s',
+                height: '100%',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.12)'
+                }
               }}>
-                <CardContent sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
-                  <Avatar sx={{ bgcolor: stat.color, width: { xs: 40, sm: 50 }, height: { xs: 40, sm: 50 } }}>
+                <CardContent sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: { xs: 1, sm: 2 },
+                  padding: { xs: 1.5, sm: 2 }
+                }}>
+                  <Avatar sx={{
+                    bgcolor: `${stat.color}15`,
+                    color: stat.color,
+                    width: { xs: 40, sm: 50 },
+                    height: { xs: 40, sm: 50 }
+                  }}>
                     {stat.icon}
                   </Avatar>
                   <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.7rem', sm: '0.875rem' } }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontSize: { xs: '0.7rem', sm: '0.875rem' } }}
+                    >
                       {stat.title}
                     </Typography>
-                    <Typography variant="h5" fontWeight="bold" sx={{ fontSize: { xs: '1rem', sm: '1.5rem' } }}>
+                    <Typography
+                      variant="h5"
+                      fontWeight="bold"
+                      sx={{ fontSize: { xs: '1rem', sm: '1.5rem' } }}
+                    >
                       {stat.value}
                     </Typography>
                   </Box>
@@ -201,7 +304,13 @@ const Dashboard = () => {
           ))}
         </Grid>
 
-        <Card sx={{ mt: 3, borderRadius: 3, p: { xs: 2, sm: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+        <Card sx={{
+          mt: 3,
+          borderRadius: 3,
+          p: { xs: 2, sm: 3 },
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)'
+        }}>
           <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ fontSize: { xs: '1.1rem', sm: '1.5rem' } }}>
             🎉 Welcome back, {user?.name}!
           </Typography>
@@ -220,13 +329,23 @@ const Dashboard = () => {
             { title: '👥 View Labour', path: '/labour/list', color: '#9c27b0' },
           ].map((link, i) => (
             <Grid item xs={6} sm={6} md={3} key={i}>
-              <Card onClick={() => navigate(link.path)}
-                sx={{ 
-                  p: { xs: 1.5, sm: 2 }, textAlign: 'center', cursor: 'pointer',
-                  bgcolor: link.color, color: 'white', borderRadius: 3,
-                  '&:hover': { opacity: 0.9, transform: 'scale(1.05)' },
+              <Card
+                onClick={() => navigate(link.path)}
+                sx={{
+                  p: { xs: 1.5, sm: 2 },
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  background: `linear-gradient(135deg, ${link.color} 0%, ${link.color}dd 100%)`,
+                  color: 'white',
+                  borderRadius: 3,
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                  '&:hover': {
+                    transform: 'scale(1.05)',
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.2)'
+                  },
                   transition: 'all 0.3s'
-                }}>
+                }}
+              >
                 <Typography variant="h6" sx={{ fontSize: { xs: '0.8rem', sm: '1.1rem' } }}>
                   {link.title}
                 </Typography>
