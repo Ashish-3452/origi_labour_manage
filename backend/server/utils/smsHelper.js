@@ -23,10 +23,11 @@ const sendOtpSms = async (mobile, otp) => {
 
     return { success: true, data: response.data };
   } catch (err) {
-    console.error('SMS error:', err.message);
-    console.log(`📱 OTP for ${mobile}: ${otp}`);
-    return { success: false, test: true };
-  }
+  console.error('SMS error status:', err.response?.status);
+  console.error('SMS error data:', JSON.stringify(err.response?.data));
+  console.log(`📱 OTP for ${mobile}: ${otp}`);
+  return { success: false, test: true };
+}
 };
 
 const generateOtp = () => {
