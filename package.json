@@ -6,7 +6,7 @@
   "main": "backend/server/server.js",
   "scripts": {
     "start": "node backend/server/server.js",
-    "postinstall": "cd frontend/client && npm install && npm run build && mkdir -p ../../backend/server/public && cp -r build/* ../../backend/server/public/",
+    "postinstall": "cd ../../frontend/client && npm install && npm run build && mkdir -p ../../backend/server/public && cp -r build/* ../../backend/server/public/",
     "dev": "nodemon backend/server/server.js"
   },
   "dependencies": {
