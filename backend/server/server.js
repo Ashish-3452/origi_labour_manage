@@ -18,6 +18,9 @@ const ThekaWork = require('./models/ThekaWork');
 const ActivityLog = require('./models/ActivityLog');
 const errorHandler = require('./middleware/errorHandler');
 const Otp = require('./models/Otp');
+const LabourSiteRate = require('./models/LabourSiteRate');
+
+
 // Load environment variables
 dotenv.config();
 
@@ -104,6 +107,9 @@ const startServer = async () => {
       await ThekaWork.createTable();
       await ActivityLog.createTable();
       await Otp.createTable();
+      await LabourSiteRate.createTable();
+      
+
       
       console.log('📦 Inserting default data...');
       await Site.createDefault();

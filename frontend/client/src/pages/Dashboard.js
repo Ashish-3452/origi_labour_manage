@@ -68,6 +68,7 @@ const Dashboard = () => {
     { text: 'Supervisors', icon: <SupervisorAccount />, path: '/supervisors' },
     { text: 'Sites', icon: <Business />, path: '/sites' },
     { text: 'Categories', icon: <Category />, path: '/categories' },
+    { text: 'Site Rates', icon: <Business />, path: '/labour/site-rates' },
     { text: 'Users', icon: <People />, path: '/users' },
     { text: 'Activity Log', icon: <History />, path: '/activity' },
     { text: 'Settings', icon: <Settings />, path: '/settings' },

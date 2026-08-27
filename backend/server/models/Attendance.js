@@ -1,4 +1,5 @@
 const { pool } = require('../config/database');
+const { getLabourRate } = require('../utils/rateResolver');
 
 class Attendance {
   
@@ -32,42 +33,36 @@ class Attendance {
     
     try {
       await pool.query(query);
-      
+      console.log('  ✅ Attendance table');
     } catch (err) {
       console.error('  ❌ Attendance table:', err.message);
       throw err;
     }
   }
 
+  // Mark attendance with site-specific rate resolution
   static async markAttendance(data) {
     const { labour_id, date, regular_hours, overtime_hours, site_id, marked_by } = data;
     
     const regHrs = regular_hours || 8;
     const otHrs = overtime_hours || 0;
-    const totalHrs = regHrs + otHrs;
     
     const regularHajri = regHrs / 8;
     const otHajri = otHrs / 8;
     const totalHajri = regularHajri + otHajri;
     
-    // Get labour rates
-    const [labour] = await pool.query(
-      `SELECT l.*, lc.company_rate_8hr, lc.company_ot_rate_hr,
-              lc.our_rate_8hr, lc.our_ot_rate_hr
-       FROM labour l
-       JOIN labour_categories lc ON l.category_id = lc.id
-       WHERE l.id = ?`, [labour_id]
-    );
+    // 🔥 Resolve rate: site-specific first, then category default
+    const rates = await getLabourRate(labour_id, site_id);
     
-    if (!labour.length) throw new Error('Labour not found');
-    
-    const rates = labour[0];
+    if (!rates) {
+      throw new Error('Labour rate not found');
+    }
     
     const companyBill = (regularHajri * rates.company_rate_8hr) + (otHrs * rates.company_ot_rate_hr);
     const ourPayment = (regularHajri * rates.our_rate_8hr) + (otHrs * rates.our_ot_rate_hr);
     const profit = companyBill - ourPayment;
     
-    const status = regular_hours < 4 ? 'absent' : regular_hours < 8 ? 'half_day' : 'present';
+    const status = regHrs < 4 ? 'absent' : regHrs < 8 ? 'half_day' : 'present';
     
     const [result] = await pool.query(
       `INSERT INTO attendance (labour_id, date, regular_hours, overtime_hours,

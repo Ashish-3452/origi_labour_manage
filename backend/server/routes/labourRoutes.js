@@ -108,4 +108,26 @@ router.get('/sites/all', authenticate, async (req, res) => {
   }
 });
 
+// Get site rates for a labour
+router.get('/site-rates/:labourId', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+  try {
+    const LabourSiteRate = require('../models/LabourSiteRate');
+    const rates = await LabourSiteRate.getAllForLabour(req.params.labourId);
+    res.json({ success: true, data: rates });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Save site-specific rate for labour
+router.post('/site-rate', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+  try {
+    const LabourSiteRate = require('../models/LabourSiteRate');
+    await LabourSiteRate.saveRate(req.body);
+    res.json({ success: true, message: 'Site rate saved!' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

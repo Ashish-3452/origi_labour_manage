@@ -20,6 +20,7 @@ import CategoryManagement from './pages/CategoryManagement';
 import ActivityLog from './pages/ActivityLog';
 import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
+import LabourSiteRates from './pages/LabourSiteRates';
 import './App.css';
 
 const theme = createTheme({
@@ -139,6 +140,13 @@ function App() {
               <Settings />
             </ProtectedRoute>
           } />
+
+          // Protected route:
+<Route path="/labour/site-rates" element={
+  <ProtectedRoute>
+    <LabourSiteRates />
+  </ProtectedRoute>
+} />
 
           {/* Catch-all - should be last */}
           <Route path="*" element={<Navigate to="/" replace />} />
