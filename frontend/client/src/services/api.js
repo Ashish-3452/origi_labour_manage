@@ -32,6 +32,8 @@ export const authAPI = {
 export const siteAPI = {
   getAll: () => api.get('/labour/sites/all'),
   create: (data) => api.post('/labour/sites/create', data),
+  update: (id, data) => api.put(`/labour/sites/update/${id}`, data),
+  delete: (id) => api.delete(`/labour/sites/delete/${id}`),
 };
 
 // Labour Category APIs

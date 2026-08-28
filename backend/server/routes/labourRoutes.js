@@ -130,4 +130,26 @@ router.post('/site-rate', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async
   }
 });
 
+// Update Site
+router.put('/sites/update/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+  try {
+    const Site = require('../models/Site');
+    await Site.update(req.params.id, req.body);
+    res.json({ success: true, message: 'Site updated successfully!' });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// Delete Site (soft delete)
+router.delete('/sites/delete/:id', authenticate, authorize('SUPER_ADMIN'), async (req, res) => {
+  try {
+    const Site = require('../models/Site');
+    await Site.delete(req.params.id);
+    res.json({ success: true, message: 'Site deleted successfully!' });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;

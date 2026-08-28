@@ -86,6 +86,22 @@ class Site {
     throw err;
   }
 }
+// Update site
+static async update(id, siteData) {
+  const { site_name, site_code, location, company_name, company_contact } = siteData;
+  await pool.query(
+    `UPDATE sites 
+     SET site_name = ?, site_code = ?, location = ?, company_name = ?, company_contact = ?
+     WHERE id = ?`,
+    [site_name, site_code, location, company_name, company_contact, id]
+  );
+}
+
+// Soft delete site
+static async delete(id) {
+  await pool.query('UPDATE sites SET is_active = FALSE WHERE id = ?', [id]);
+}
+
 }
 
 module.exports = Site;
