@@ -164,4 +164,16 @@ router.get('/active-count', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUP
   }
 });
 
+// Toggle labour active/inactive status
+router.put('/toggle-status/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+  try {
+    const { pool } = require('../config/database');
+    const { is_active } = req.body;
+    await pool.query('UPDATE labour SET is_active = ? WHERE id = ?', [is_active, req.params.id]);
+    res.json({ success: true, message: 'Labour status updated!' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;

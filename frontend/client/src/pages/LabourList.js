@@ -86,6 +86,19 @@ const LabourList = () => {
     setOpenDetails(true);
   };
 
+  const handleToggleStatus = async (id, status) => {
+  if (!window.confirm(status ? 'Labour ko active kare?' : 'Labour ko left mark kare?')) return;
+  setLoading(true);
+  try {
+    await labourAPI.toggleStatus(id, status);
+    loadData(); // active list refresh
+  } catch (err) {
+    console.error('Status update error:', err);
+  } finally {
+    setLoading(false);
+  }
+};
+
   const getCategoryColor = (code) => {
     const colors = { MAN: '#1976d2', LAD: '#e91e63', MAS: '#ff9800', CAR: '#795548' };
     return colors[code] || '#666';
@@ -182,10 +195,13 @@ const LabourList = () => {
                     <TableCell>{lab.site_name}</TableCell>
                     <TableCell>₹{lab.our_rate_8hr || '-'}</TableCell>
                     <TableCell>
-                      <IconButton size="small" color="primary" onClick={() => handleViewDetails(lab)}>
-                        <Visibility />
-                      </IconButton>
-                    </TableCell>
+  <IconButton size="small" color="primary" onClick={() => handleViewDetails(lab)}>
+    <Visibility />
+  </IconButton>
+  <IconButton size="small" color="error" onClick={() => handleToggleStatus(lab.id, false)} title="Mark as Left">
+    <Close />
+  </IconButton>
+</TableCell>
                   </TableRow>
                 ))}
                 {labour.length === 0 && (

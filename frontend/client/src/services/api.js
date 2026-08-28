@@ -48,6 +48,7 @@ export const labourAPI = {
   getById: (id) => api.get(`/labour/${id}`),
     getInactive: () => api.get('/labour/inactive'),
   getActiveCount: () => api.get('/labour/active-count'),
+  toggleStatus: (id, status) => api.put(`/labour/toggle-status/${id}`, { is_active: status }),
 };
 
 export default api;
