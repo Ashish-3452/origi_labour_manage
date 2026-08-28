@@ -21,23 +21,8 @@ await pool.query(
 router.get('/list', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'), async (req, res) => {
   try {
     const Labour = require('../models/Labour');
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50;
-    const offset = (page - 1) * limit;
-    
-    const labour = await Labour.getAll({ ...req.query, limit, offset });
-    const total = await Labour.getCount(req.query);
-    
-    res.json({
-      success: true,
-      data: labour,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
-      }
-    });
+    const labour = await Labour.getAll();
+    res.json({ success: true, count: labour.length, data: labour });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
