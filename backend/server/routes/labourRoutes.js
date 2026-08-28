@@ -21,7 +21,12 @@ await pool.query(
 router.get('/list', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'), async (req, res) => {
   try {
     const Labour = require('../models/Labour');
-    const labour = await Labour.getAll();
+    const filters = {
+      site_id: req.query.site_id || null,
+      category_id: req.query.category_id || null,
+      search: req.query.search || null
+    };
+    const labour = await Labour.getAll(filters);
     res.json({ success: true, count: labour.length, data: labour });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

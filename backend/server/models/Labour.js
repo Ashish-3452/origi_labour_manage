@@ -56,9 +56,9 @@ class Labour {
     return { id: result.insertId, labour_code };
   }
 
-  static async getAll() {
-  const query = `
-    SELECT l.id, l.labour_code, l.name, l.mobile, l.is_active,
+  static async getAll(filters = {}) {
+  let query = `
+    SELECT l.id, l.labour_code, l.name, l.mobile, l.address,
            lc.category_name, lc.category_code,
            lc.company_rate_8hr, lc.our_rate_8hr, lc.khoraki_rate,
            s.site_name
@@ -66,9 +66,25 @@ class Labour {
     LEFT JOIN labour_categories lc ON l.category_id = lc.id
     LEFT JOIN sites s ON l.site_id = s.id
     WHERE l.is_active = TRUE
-    ORDER BY l.name ASC
   `;
-  const [rows] = await pool.query(query);
+  const params = [];
+
+  if (filters.site_id) {
+    query += ' AND l.site_id = ?';
+    params.push(filters.site_id);
+  }
+  if (filters.category_id) {
+    query += ' AND l.category_id = ?';
+    params.push(filters.category_id);
+  }
+  if (filters.search) {
+    query += ' AND (l.name LIKE ? OR l.mobile LIKE ? OR l.labour_code LIKE ?)';
+    const s = `%${filters.search}%`;
+    params.push(s, s, s);
+  }
+
+  query += ' ORDER BY l.name ASC';
+  const [rows] = await pool.query(query, params);
   return rows;
 }
 
