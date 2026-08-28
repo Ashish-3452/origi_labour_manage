@@ -101,6 +101,31 @@ class Labour {
     );
     return rows[0];
   }
+// Get all inactive labour with advance balance
+static async getInactiveLabour() {
+  const query = `
+    SELECT l.id, l.labour_code, l.name, l.mobile,
+           l.total_advance_taken, l.total_advance_recovered,
+           (l.total_advance_taken - l.total_advance_recovered) as balance_due,
+           lc.category_name, s.site_name
+    FROM labour l
+    LEFT JOIN labour_categories lc ON l.category_id = lc.id
+    LEFT JOIN sites s ON l.site_id = s.id
+    WHERE l.is_active = FALSE
+    ORDER BY l.name ASC
+  `;
+  const [rows] = await pool.query(query);
+  return rows;
+}
+
+// Get total count of active labour
+static async getActiveCount() {
+  const [rows] = await pool.query(
+    'SELECT COUNT(*) as count FROM labour WHERE is_active = TRUE'
+  );
+  return rows[0].count;
+}
+
 }
 
 module.exports = Labour;

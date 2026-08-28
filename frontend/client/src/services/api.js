@@ -46,6 +46,8 @@ export const labourAPI = {
   register: (data) => api.post('/labour/register', data),
   getAll: (filters) => api.get('/labour/list', { params: filters }),
   getById: (id) => api.get(`/labour/${id}`),
+    getInactive: () => api.get('/labour/inactive'),
+  getActiveCount: () => api.get('/labour/active-count'),
 };
 
 export default api;

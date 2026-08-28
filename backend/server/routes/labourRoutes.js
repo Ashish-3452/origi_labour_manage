@@ -142,4 +142,26 @@ router.delete('/sites/delete/:id', authenticate, authorize('SUPER_ADMIN'), async
   }
 });
 
+// Get inactive labour list
+router.get('/inactive', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+  try {
+    const Labour = require('../models/Labour');
+    const inactive = await Labour.getInactiveLabour();
+    res.json({ success: true, data: inactive });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Get active labour count
+router.get('/active-count', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'), async (req, res) => {
+  try {
+    const Labour = require('../models/Labour');
+    const count = await Labour.getActiveCount();
+    res.json({ success: true, count });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;

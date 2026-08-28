@@ -3,7 +3,7 @@ import {
   Box, Paper, Typography, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Button, TextField,
   MenuItem, Grid, Chip, IconButton, Dialog, DialogContent,
-  DialogTitle, CircularProgress
+  DialogTitle, CircularProgress, Tabs, Tab
 } from '@mui/material';
 import { Add, Search, Visibility, Close } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -18,22 +18,33 @@ const LabourList = () => {
   const [selectedLabour, setSelectedLabour] = useState(null);
   const [openDetails, setOpenDetails] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [tab, setTab] = useState(0);
+  const [inactiveLabour, setInactiveLabour] = useState([]);
+  const [totalActive, setTotalActive] = useState(0);
 
   useEffect(() => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (tab === 1) {
+      loadInactiveLabour();
+    }
+  }, [tab]);
+
   const loadData = async () => {
     setLoading(true);
     try {
-      const [labRes, catRes, siteRes] = await Promise.all([
+      const [labRes, catRes, siteRes, countRes] = await Promise.all([
         labourAPI.getAll(),
         categoryAPI.getAll(),
-        siteAPI.getAll()
+        siteAPI.getAll(),
+        labourAPI.getActiveCount()
       ]);
       setLabour(labRes.data.data);
       setCategories(catRes.data.data);
       setSites(siteRes.data.data);
+      setTotalActive(countRes.data.count);
     } catch (err) {
       console.error('Load error:', err);
     } finally {
@@ -53,6 +64,18 @@ const LabourList = () => {
       setLabour(res.data.data);
     } catch (err) {
       console.error('Search error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadInactiveLabour = async () => {
+    setLoading(true);
+    try {
+      const res = await labourAPI.getInactive();
+      setInactiveLabour(res.data.data);
+    } catch (err) {
+      console.error('Inactive load error:', err);
     } finally {
       setLoading(false);
     }
@@ -78,92 +101,143 @@ const LabourList = () => {
           </Button>
         </Box>
 
-        {/* Filters */}
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth size="small" label="Search" value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              placeholder="Name, Mobile, Code"
-              InputProps={{ endAdornment: <Search /> }}
-            />
+        {tab === 0 && (
+          <Grid container spacing={2} sx={{ mb: 3 }}>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth size="small" label="Search" value={filters.search}
+                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                placeholder="Name, Mobile, Code"
+                InputProps={{ endAdornment: <Search /> }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <TextField
+                fullWidth select size="small" label="Category" value={filters.category_id}
+                onChange={(e) => setFilters({ ...filters, category_id: e.target.value })}
+              >
+                <MenuItem value="">All Categories</MenuItem>
+                {categories.map(cat => (
+                  <MenuItem key={cat.id} value={cat.id}>{cat.category_name}</MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <TextField
+                fullWidth select size="small" label="Site" value={filters.site_id}
+                onChange={(e) => setFilters({ ...filters, site_id: e.target.value })}
+              >
+                <MenuItem value="">All Sites</MenuItem>
+                {sites.map(site => (
+                  <MenuItem key={site.id} value={site.id}>{site.site_name}</MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={2}>
+              <Button fullWidth variant="outlined" onClick={handleSearch} sx={{ py: 1 }} disabled={loading}>
+                {loading ? <CircularProgress size={20} /> : 'Filter'}
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={3}>
-            <TextField
-              fullWidth select size="small" label="Category" value={filters.category_id}
-              onChange={(e) => setFilters({ ...filters, category_id: e.target.value })}
-            >
-              <MenuItem value="">All Categories</MenuItem>
-              {categories.map(cat => (
-                <MenuItem key={cat.id} value={cat.id}>{cat.category_name}</MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <TextField
-              fullWidth select size="small" label="Site" value={filters.site_id}
-              onChange={(e) => setFilters({ ...filters, site_id: e.target.value })}
-            >
-              <MenuItem value="">All Sites</MenuItem>
-              {sites.map(site => (
-                <MenuItem key={site.id} value={site.id}>{site.site_name}</MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={12} sm={2}>
-            <Button fullWidth variant="outlined" onClick={handleSearch} sx={{ py: 1 }} disabled={loading}>
-              {loading ? <CircularProgress size={20} /> : 'Filter'}
-            </Button>
-          </Grid>
-        </Grid>
+        )}
 
-        {/* Table */}
-        <TableContainer sx={{ overflowX: 'auto' }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow sx={{ bgcolor: '#f5f5f5' }}>
-                <TableCell><strong>Code</strong></TableCell>
-                <TableCell><strong>Name</strong></TableCell>
-                <TableCell><strong>Mobile</strong></TableCell>
-                <TableCell><strong>Category</strong></TableCell>
-                <TableCell><strong>Site</strong></TableCell>
-                <TableCell><strong>Rate</strong></TableCell>
-                <TableCell><strong>Action</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {labour.map((lab) => (
-                <TableRow key={lab.id} hover>
-                  <TableCell>{lab.labour_code}</TableCell>
-                  <TableCell>{lab.name}</TableCell>
-                  <TableCell>{lab.mobile || '-'}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={lab.category_name}
-                      size="small"
-                      sx={{ bgcolor: getCategoryColor(lab.category_code), color: 'white' }}
-                    />
-                  </TableCell>
-                  <TableCell>{lab.site_name}</TableCell>
-                  <TableCell>₹{lab.our_rate_8hr || '-'}</TableCell>
-                  <TableCell>
-                    <IconButton size="small" color="primary" onClick={() => handleViewDetails(lab)}>
-                      <Visibility />
-                    </IconButton>
-                  </TableCell>
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          Total Active Labour: <strong>{totalActive}</strong>
+        </Typography>
+
+        <Tabs value={tab} onChange={(e, v) => setTab(v)} sx={{ mb: 2 }}>
+          <Tab label="Active Labour" />
+          <Tab label="Left Labour" />
+        </Tabs>
+
+        {tab === 0 && (
+          <TableContainer sx={{ overflowX: 'auto' }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow sx={{ bgcolor: '#f5f5f5' }}>
+                  <TableCell><strong>#</strong></TableCell>
+                  <TableCell><strong>Code</strong></TableCell>
+                  <TableCell><strong>Name</strong></TableCell>
+                  <TableCell><strong>Mobile</strong></TableCell>
+                  <TableCell><strong>Category</strong></TableCell>
+                  <TableCell><strong>Site</strong></TableCell>
+                  <TableCell><strong>Rate</strong></TableCell>
+                  <TableCell><strong>Action</strong></TableCell>
                 </TableRow>
-              ))}
-              {labour.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} align="center">No labour found</TableCell>
+              </TableHead>
+              <TableBody>
+                {labour.map((lab, index) => (
+                  <TableRow key={lab.id} hover>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{lab.labour_code}</TableCell>
+                    <TableCell>{lab.name}</TableCell>
+                    <TableCell>{lab.mobile || '-'}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={lab.category_name}
+                        size="small"
+                        sx={{ bgcolor: getCategoryColor(lab.category_code), color: 'white' }}
+                      />
+                    </TableCell>
+                    <TableCell>{lab.site_name}</TableCell>
+                    <TableCell>₹{lab.our_rate_8hr || '-'}</TableCell>
+                    <TableCell>
+                      <IconButton size="small" color="primary" onClick={() => handleViewDetails(lab)}>
+                        <Visibility />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {labour.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={8} align="center">No labour found</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+
+        {tab === 1 && (
+          <TableContainer sx={{ overflowX: 'auto' }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow sx={{ bgcolor: '#f5f5f5' }}>
+                  <TableCell>#</TableCell>
+                  <TableCell>Code</TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Mobile</TableCell>
+                  <TableCell>Advance Taken</TableCell>
+                  <TableCell>Recovered</TableCell>
+                  <TableCell>Balance Due</TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {inactiveLabour.map((lab, index) => (
+                  <TableRow key={lab.id}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{lab.labour_code}</TableCell>
+                    <TableCell>{lab.name}</TableCell>
+                    <TableCell>{lab.mobile || '-'}</TableCell>
+                    <TableCell>₹{Number(lab.total_advance_taken || 0).toLocaleString()}</TableCell>
+                    <TableCell>₹{Number(lab.total_advance_recovered || 0).toLocaleString()}</TableCell>
+                    <TableCell>
+                      ₹{Number(lab.balance_due || 0).toLocaleString()}
+                      {Number(lab.balance_due) > 0 ? ' (Dues)' : ' (Settled)'}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {inactiveLabour.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} align="center">No left labour</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Paper>
 
-      {/* Details Dialog */}
       <Dialog open={openDetails} onClose={() => setOpenDetails(false)} maxWidth="sm" fullWidth>
         <DialogTitle>
           Labour Details
@@ -181,7 +255,6 @@ const LabourList = () => {
               <Grid item xs={6}><Typography variant="body2" color="text.secondary">Site</Typography><Typography>{selectedLabour.site_name}</Typography></Grid>
               <Grid item xs={6}><Typography variant="body2" color="text.secondary">Company Rate</Typography><Typography>₹{selectedLabour.company_rate_8hr}</Typography></Grid>
               <Grid item xs={6}><Typography variant="body2" color="text.secondary">Our Rate</Typography><Typography>₹{selectedLabour.our_rate_8hr}</Typography></Grid>
-              <Grid item xs={6}><Typography variant="body2" color="text.secondary">Khoraki Rate</Typography><Typography>₹{selectedLabour.khoraki_rate}</Typography></Grid>
               <Grid item xs={12}><Typography variant="body2" color="text.secondary">Address</Typography><Typography>{selectedLabour.address || '-'}</Typography></Grid>
             </Grid>
           )}
