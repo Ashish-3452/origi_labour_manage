@@ -55,13 +55,37 @@ class Site {
   }
 
   static async create(siteData) {
-    const { site_name, site_code, location, company_name, company_contact } = siteData;
+  const { site_name, location, company_name, company_contact } = siteData;
+  
+  // Unique code generate karo (random + timestamp)
+  const generateUniqueCode = async () => {
+    let code;
+    let exists = true;
+    while (exists) {
+      const rand = Math.floor(1000 + Math.random() * 9000);
+      code = `SITE${rand}`;
+      const [rows] = await pool.query('SELECT id FROM sites WHERE site_code = ?', [code]);
+      exists = rows.length > 0;
+    }
+    return code;
+  };
+
+  const site_code = siteData.site_code || await generateUniqueCode();
+
+  try {
     const [result] = await pool.query(
-      `INSERT INTO sites (site_name, site_code, location, company_name, company_contact) VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO sites (site_name, site_code, location, company_name, company_contact) 
+       VALUES (?, ?, ?, ?, ?)`,
       [site_name, site_code, location, company_name, company_contact]
     );
     return result.insertId;
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      throw new Error('Site code duplicate. Please try again.');
+    }
+    throw err;
   }
+}
 }
 
 module.exports = Site;
