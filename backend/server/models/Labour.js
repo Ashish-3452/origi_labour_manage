@@ -32,7 +32,7 @@ class Labour {
     
     try {
       await pool.query(query);
-      
+      console.log('  ✅ Labour table');  // ← ADD THIS
     } catch (err) {
       console.error('  ❌ Labour table:', err.message);
       throw err;

@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import { Save, Business } from '@mui/icons-material';
 import { labourAPI, siteAPI } from '../services/api';
-import api from '../services/api';
+import { siteRateAPI } from '../services/api';
 
 const LabourSiteRates = () => {
   const [labourList, setLabourList] = useState([]);
@@ -47,7 +47,7 @@ const LabourSiteRates = () => {
     // Load existing rates for this labour
     if (labourId) {
       try {
-        const res = await api.get(`/labour/site-rates/${labourId}`);
+        const res = await siteRateAPI.getByLabour(labourId);
         setSavedRates(res.data.data);
       } catch (err) {
         setSavedRates([]);
@@ -68,14 +68,14 @@ const LabourSiteRates = () => {
     setSuccess('');
 
     try {
-      await api.post('/labour/site-rate', {
-        labour_id: form.labour_id,
-        site_id: form.site_id,
-        company_rate: parseFloat(form.company_rate),
-        company_ot: parseFloat(form.company_ot || 0),
-        our_rate: parseFloat(form.our_rate),
-        our_ot: parseFloat(form.our_ot || 0)
-      });
+      await siteRateAPI.save({
+  labour_id: form.labour_id,
+  site_id: form.site_id,
+  company_rate: parseFloat(form.company_rate),
+  company_ot: parseFloat(form.company_ot || 0),
+  our_rate: parseFloat(form.our_rate),
+  our_ot: parseFloat(form.our_ot || 0)
+});
 
       setSuccess('Site rate saved successfully!');
       setForm({

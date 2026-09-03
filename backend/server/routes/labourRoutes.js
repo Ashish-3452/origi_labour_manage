@@ -2,17 +2,49 @@ const express = require('express');
 const router = express.Router();
 const { authenticate, authorize } = require('../middleware/auth');
 
-// Labour CRUD
+// ============ LABOUR CRUD ============
 router.post('/register', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
   try {
     const Labour = require('../models/Labour');
     const result = await Labour.create(req.body);
     const { pool } = require('../config/database');
-await pool.query(
-  'INSERT INTO activity_logs (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)',
-  [req.user.id, 'LABOUR_ADD', `Registered new labour: ${req.body.name}`, req.ip]
-);
+    await pool.query(
+      'INSERT INTO activity_logs (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)',
+      [req.user.id, 'LABOUR_ADD', `Registered new labour: ${req.body.name}`, req.ip]
+    );
     res.status(201).json({ success: true, data: result, message: 'Labour registered successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ⚠️ Specific routes PEHLE (before /:id)
+router.get('/inactive', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+  try {
+    const Labour = require('../models/Labour');
+    const inactive = await Labour.getInactiveLabour();
+    res.json({ success: true, data: inactive });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+router.get('/active-count', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'), async (req, res) => {
+  try {
+    const Labour = require('../models/Labour');
+    const count = await Labour.getActiveCount();
+    res.json({ success: true, count });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+router.put('/toggle-status/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+  try {
+    const { pool } = require('../config/database');
+    const { is_active } = req.body;
+    await pool.query('UPDATE labour SET is_active = ? WHERE id = ?', [is_active, req.params.id]);
+    res.json({ success: true, message: 'Labour status updated!' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -33,72 +65,7 @@ router.get('/list', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'
   }
 });
 
-router.get('/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'), async (req, res) => {
-  try {
-    const Labour = require('../models/Labour');
-    const labour = await Labour.getById(req.params.id);
-    if (!labour) return res.status(404).json({ success: false, error: 'Labour not found' });
-    res.json({ success: true, data: labour });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// Categories
-router.get('/categories/all', authenticate, async (req, res) => {
-  try {
-    const LabourCategory = require('../models/LabourCategory');
-    const categories = await LabourCategory.getAll();
-    res.json({ success: true, data: categories });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// Sites
-router.get('/sites/all', authenticate, async (req, res) => {
-  try {
-    const Site = require('../models/Site');
-    const sites = await Site.getAll();
-    res.json({ success: true, data: sites });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-router.post('/sites/create', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
-  try {
-    const Site = require('../models/Site');
-    const siteId = await Site.create(req.body);
-    res.status(201).json({ success: true, id: siteId, message: 'Site created' });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// Create Site
-router.post('/sites/create', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
-  try {
-    const Site = require('../models/Site');
-    const id = await Site.create(req.body);
-    res.status(201).json({ success: true, id, message: 'Site created!' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Get all sites (already exists but confirm)
-router.get('/sites/all', authenticate, async (req, res) => {
-  try {
-    const Site = require('../models/Site');
-    const sites = await Site.getAll();
-    res.json({ success: true, data: sites });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Get site rates for a labour
+// ============ SITE RATES ============
 router.get('/site-rates/:labourId', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
   try {
     const LabourSiteRate = require('../models/LabourSiteRate');
@@ -109,7 +76,6 @@ router.get('/site-rates/:labourId', authenticate, authorize('SUPER_ADMIN', 'ADMI
   }
 });
 
-// Save site-specific rate for labour
 router.post('/site-rate', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
   try {
     const LabourSiteRate = require('../models/LabourSiteRate');
@@ -120,7 +86,37 @@ router.post('/site-rate', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async
   }
 });
 
-// Update Site
+// ============ CATEGORIES & SITES ============
+router.get('/categories/all', authenticate, async (req, res) => {
+  try {
+    const LabourCategory = require('../models/LabourCategory');
+    const categories = await LabourCategory.getAll();
+    res.json({ success: true, data: categories });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/sites/all', authenticate, async (req, res) => {
+  try {
+    const Site = require('../models/Site');
+    const sites = await Site.getAll();
+    res.json({ success: true, data: sites });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/sites/create', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+  try {
+    const Site = require('../models/Site');
+    const id = await Site.create(req.body);
+    res.status(201).json({ success: true, id, message: 'Site created successfully!' });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
 router.put('/sites/update/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
   try {
     const Site = require('../models/Site');
@@ -131,7 +127,6 @@ router.put('/sites/update/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN'),
   }
 });
 
-// Delete Site (soft delete)
 router.delete('/sites/delete/:id', authenticate, authorize('SUPER_ADMIN'), async (req, res) => {
   try {
     const Site = require('../models/Site');
@@ -142,35 +137,13 @@ router.delete('/sites/delete/:id', authenticate, authorize('SUPER_ADMIN'), async
   }
 });
 
-// Get inactive labour list
-router.get('/inactive', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+// ⚠️ YE ROUTE SABSE LAST ME HONA CHAHIYE (/:id generic hai)
+router.get('/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'), async (req, res) => {
   try {
     const Labour = require('../models/Labour');
-    const inactive = await Labour.getInactiveLabour();
-    res.json({ success: true, data: inactive });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// Get active labour count
-router.get('/active-count', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'), async (req, res) => {
-  try {
-    const Labour = require('../models/Labour');
-    const count = await Labour.getActiveCount();
-    res.json({ success: true, count });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// Toggle labour active/inactive status
-router.put('/toggle-status/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
-  try {
-    const { pool } = require('../config/database');
-    const { is_active } = req.body;
-    await pool.query('UPDATE labour SET is_active = ? WHERE id = ?', [is_active, req.params.id]);
-    res.json({ success: true, message: 'Labour status updated!' });
+    const labour = await Labour.getById(req.params.id);
+    if (!labour) return res.status(404).json({ success: false, error: 'Labour not found' });
+    res.json({ success: true, data: labour });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

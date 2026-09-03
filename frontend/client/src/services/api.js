@@ -51,4 +51,10 @@ export const labourAPI = {
   toggleStatus: (id, status) => api.put(`/labour/toggle-status/${id}`, { is_active: status }),
 };
 
+// Site Rate APIs
+export const siteRateAPI = {
+  getByLabour: (labourId) => api.get(`/labour/site-rates/${labourId}`),
+  save: (data) => api.post('/labour/site-rate', data),
+};
+
 export default api;
