@@ -15,6 +15,10 @@ router.post('/register', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async 
     res.status(201).json({ success: true, data: result, message: 'Labour registered successfully' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
+    const msg = err.message.includes('already registered')
+    ? err.message
+    : 'Server error. Please try again.';
+  res.status(400).json({ success: false, error: msg });
   }
 });
 

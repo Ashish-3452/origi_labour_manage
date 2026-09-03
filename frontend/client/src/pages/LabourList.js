@@ -53,21 +53,28 @@ const LabourList = () => {
   };
 
   const handleSearch = async () => {
-    setLoading(true);
-    try {
-      const params = {
-        search: filters.search || undefined,
-        category_id: filters.category_id || undefined,
-        site_id: filters.site_id || undefined
-      };
-      const res = await labourAPI.getAll(params);
-      setLabour(res.data.data);
-    } catch (err) {
-      console.error('Search error:', err);
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  try {
+    const params = {};
+    // Sirf non-empty values bhejo
+    if (filters.search.trim()) {
+      params.search = filters.search.trim();
     }
-  };
+    if (filters.category_id) {
+      params.category_id = filters.category_id;
+    }
+    if (filters.site_id) {
+      params.site_id = filters.site_id;
+    }
+
+    const res = await labourAPI.getAll(params);
+    setLabour(res.data.data);
+  } catch (err) {
+    console.error('Search error:', err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const loadInactiveLabour = async () => {
     setLoading(true);
@@ -120,6 +127,7 @@ const LabourList = () => {
               <TextField
                 fullWidth size="small" label="Search" value={filters.search}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                onKeyPress={(e) => { if (e.key === 'Enter') handleSearch(); }}
                 placeholder="Name, Mobile, Code"
                 InputProps={{ endAdornment: <Search /> }}
               />

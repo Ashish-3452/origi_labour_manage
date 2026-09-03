@@ -45,6 +45,16 @@ class Labour {
 
   static async create(labourData) {
     const { name, mobile, aadhar_no, address, category_id, site_id, emergency_contact } = labourData;
+    // 🔥 Duplicate check (mobile ya name)
+  const [existing] = await pool.query(
+    'SELECT id FROM labour WHERE (mobile = ? AND mobile IS NOT NULL AND mobile != "") OR (name = ?)',
+    [mobile, name]
+  );
+
+  if (existing.length > 0) {
+    throw new Error('Labour already registered with same mobile or name!');
+  }
+
     const labour_code = this.generateCode();
     
     const [result] = await pool.query(
