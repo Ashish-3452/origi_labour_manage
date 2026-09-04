@@ -42,51 +42,56 @@ class Attendance {
 
   // Mark attendance with site-specific rate resolution
   static async markAttendance(data) {
-    const { labour_id, date, regular_hours, overtime_hours, site_id, marked_by } = data;
-    
-    const regHrs = regular_hours || 8;
-    const otHrs = overtime_hours || 0;
-    
-    const regularHajri = regHrs / 8;
-    const otHajri = otHrs / 8;
-    const totalHajri = regularHajri + otHajri;
-    
-    // 🔥 Resolve rate: site-specific first, then category default
-    const rates = await getLabourRate(labour_id, site_id);
-    
-    if (!rates) {
-      throw new Error('Labour rate not found');
-    }
-    
-    const companyBill = (regularHajri * rates.company_rate_8hr) + (otHrs * rates.company_ot_rate_hr);
-    const ourPayment = (regularHajri * rates.our_rate_8hr) + (otHrs * rates.our_ot_rate_hr);
-    const profit = companyBill - ourPayment;
-    
-    const status = regHrs < 4 ? 'absent' : regHrs < 8 ? 'half_day' : 'present';
-    
-    const [result] = await pool.query(
-      `INSERT INTO attendance (labour_id, date, regular_hours, overtime_hours,
-        regular_hajri, ot_hajri, total_hajri, company_bill, our_payment, profit,
-        site_id, status, marked_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE
-        regular_hours=VALUES(regular_hours), overtime_hours=VALUES(overtime_hours),
-        regular_hajri=VALUES(regular_hajri), ot_hajri=VALUES(ot_hajri),
-        total_hajri=VALUES(total_hajri), company_bill=VALUES(company_bill),
-        our_payment=VALUES(our_payment), profit=VALUES(profit),
-        status=VALUES(status)`,
-      [labour_id, date, regHrs, otHrs, regularHajri, otHajri, totalHajri,
-       companyBill, ourPayment, profit, site_id, status, marked_by]
-    );
-    
-    return {
-      id: result.insertId,
-      total_hajri: totalHajri,
-      company_bill: companyBill,
-      our_payment: ourPayment,
-      profit: profit
-    };
-  }
-}
+  const { labour_id, date, regular_hours, overtime_hours, site_id, marked_by } = data;
+  
+  const regHrs = regular_hours || 8;
+  const otHrs = overtime_hours || 0;
+  const regularHajri = regHrs / 8;
+  const otHajri = otHrs / 8;
+  const totalHajri = regularHajri + otHajri;
 
+  // 🔥 CATEGORY RATE SEEDHA LO (koi site-rate nahi)
+  const [labourRate] = await pool.query(
+    `SELECT lc.company_rate_8hr, lc.company_ot_rate_hr,
+            lc.our_rate_8hr, lc.our_ot_rate_hr
+     FROM labour l
+     JOIN labour_categories lc ON l.category_id = lc.id
+     WHERE l.id = ?`,
+    [labour_id]
+  );
+
+  if (!labourRate.length) {
+    throw new Error(`Labour ka rate nahi mila (ID: ${labour_id})`);
+  }
+
+  const rates = labourRate[0];
+  const companyBill = (regularHajri * rates.company_rate_8hr) + (otHrs * rates.company_ot_rate_hr);
+  const ourPayment = (regularHajri * rates.our_rate_8hr) + (otHrs * rates.our_ot_rate_hr);
+  const profit = companyBill - ourPayment;
+  const status = regHrs < 4 ? 'absent' : regHrs < 8 ? 'half_day' : 'present';
+
+  const [result] = await pool.query(
+    `INSERT INTO attendance (labour_id, date, regular_hours, overtime_hours,
+      regular_hajri, ot_hajri, total_hajri, company_bill, our_payment, profit,
+      site_id, status, marked_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE
+      regular_hours=VALUES(regular_hours), overtime_hours=VALUES(overtime_hours),
+      regular_hajri=VALUES(regular_hajri), ot_hajri=VALUES(ot_hajri),
+      total_hajri=VALUES(total_hajri), company_bill=VALUES(company_bill),
+      our_payment=VALUES(our_payment), profit=VALUES(profit),
+      status=VALUES(status)`,
+    [labour_id, date, regHrs, otHrs, regularHajri, otHajri, totalHajri,
+     companyBill, ourPayment, profit, site_id, status, marked_by]
+  );
+
+  return {
+    id: result.insertId,
+    total_hajri: totalHajri,
+    company_bill: companyBill,
+    our_payment: ourPayment,
+    profit: profit
+  };
+}
+}
 module.exports = Attendance;
