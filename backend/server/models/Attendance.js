@@ -93,5 +93,78 @@ class Attendance {
     profit: profit
   };
 }
+// Morning Preset: Subah sab active labour ko temporary present mark
+static async markMorningPreset(site_id, date, marked_by) {
+  const targetDate = date || new Date().toISOString().split('T')[0];
+
+  const [labour] = await pool.query(
+    'SELECT id FROM labour WHERE is_active = TRUE AND site_id = ?',
+    [site_id]
+  );
+
+  const results = [];
+  for (const lab of labour) {
+    await pool.query(
+      `INSERT INTO attendance (labour_id, date, site_id, regular_hours, overtime_hours, regular_hajri, ot_hajri, total_hajri, company_bill, our_payment, profit, status, marked_by, is_finalized)
+       VALUES (?, ?, ?, 8, 0, 1, 0, 1, 0, 0, 0, 'present', ?, FALSE)
+       ON DUPLICATE KEY UPDATE labour_id=labour_id`,
+      [lab.id, targetDate, site_id, marked_by]
+    );
+    results.push(lab.id);
+  }
+  return { count: results.length };
+}
+
+// Finalize/Update Attendance (Shaam ka final status)
+static async finalizeAttendance(data) {
+  const { labour_id, date, regular_hours, overtime_hours, status, marked_by } = data;
+  const regHrs = regular_hours || 0;
+  const otHrs = overtime_hours || 0;
+
+  const [labourRate] = await pool.query(
+    `SELECT lc.company_rate_8hr, lc.company_ot_rate_hr,
+            lc.our_rate_8hr, lc.our_ot_rate_hr
+     FROM labour l
+     JOIN labour_categories lc ON l.category_id = lc.id
+     WHERE l.id = ?`,
+    [labour_id]
+  );
+  if (!labourRate.length) throw new Error('Labour rate not found');
+  const rates = labourRate[0];
+
+  const regularHajri = regHrs / 8;
+  const otHajri = otHrs / 8;
+  const totalHajri = regularHajri + otHajri;
+  const companyBill = (regularHajri * rates.company_rate_8hr) + (otHrs * rates.company_ot_rate_hr);
+  const ourPayment = (regularHajri * rates.our_rate_8hr) + (otHrs * rates.our_ot_rate_hr);
+  const profit = companyBill - ourPayment;
+
+  await pool.query(
+    `UPDATE attendance SET
+      regular_hours = ?, overtime_hours = ?,
+      regular_hajri = ?, ot_hajri = ?, total_hajri = ?,
+      company_bill = ?, our_payment = ?, profit = ?,
+      status = ?, is_finalized = TRUE
+     WHERE labour_id = ? AND date = ?`,
+    [regHrs, otHrs, regularHajri, otHajri, totalHajri, companyBill, ourPayment, profit, status, labour_id, date]
+  );
+
+  return { success: true };
+}
+
+// Attendance list for a date/site
+static async getList(date, site_id) {
+  const query = `
+    SELECT a.*, l.name, l.labour_code, lc.category_name, s.site_name
+    FROM attendance a
+    JOIN labour l ON a.labour_id = l.id
+    JOIN labour_categories lc ON l.category_id = lc.id
+    JOIN sites s ON a.site_id = s.id
+    WHERE a.date = ? AND a.site_id = ?
+  `;
+  const [rows] = await pool.query(query, [date, site_id]);
+  return rows;
+}
+
 }
 module.exports = Attendance;

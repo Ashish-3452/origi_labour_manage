@@ -12,12 +12,12 @@ router.get('/stats', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req
       'SELECT COUNT(*) as total FROM labour WHERE is_active = TRUE'
     );
     
-    // Today's Attendance
     const [todayAttendance] = await pool.query(
-      `SELECT COUNT(*) as present, SUM(total_hajri) as total_hajri,
-              SUM(profit) as total_profit
-       FROM attendance WHERE date = CURDATE()`
-    );
+  `SELECT COUNT(*) as present, SUM(total_hajri) as total_hajri,
+          SUM(profit) as total_profit
+   FROM attendance
+   WHERE date = CURDATE() AND is_finalized = TRUE`
+);
     
     // Total Outstanding Advances
     const [advances] = await pool.query(

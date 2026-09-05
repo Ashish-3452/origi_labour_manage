@@ -75,4 +75,39 @@ router.get('/today-summary', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), as
   }
 });
 
+// Morning Preset (Subah ka temporary mark)
+router.post('/morning-preset', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'), async (req, res) => {
+  try {
+    const { site_id, date } = req.body;
+    const Attendance = require('../models/Attendance');
+    const result = await Attendance.markMorningPreset(site_id, date, req.user.id);
+    res.json({ success: true, count: result.count, message: 'Morning preset done!' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Finalize Attendance (Shaam ka final update)
+router.put('/finalize', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'), async (req, res) => {
+  try {
+    const Attendance = require('../models/Attendance');
+    const result = await Attendance.finalizeAttendance(req.body);
+    res.json({ success: true, message: 'Attendance finalized!' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Get attendance list for date & site
+router.get('/list', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'), async (req, res) => {
+  try {
+    const { date, site_id } = req.query;
+    const Attendance = require('../models/Attendance');
+    const attendance = await Attendance.getList(date, site_id);
+    res.json({ success: true, data: attendance });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
