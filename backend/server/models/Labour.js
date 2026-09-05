@@ -69,13 +69,15 @@ class Labour {
   static async getAll(filters = {}) {
   let query = `
     SELECT l.id, l.labour_code, l.name, l.mobile, l.address,
-           lc.category_name, lc.category_code,
-           lc.company_rate_8hr, lc.our_rate_8hr, lc.khoraki_rate,
-           s.site_name
-    FROM labour l
-    LEFT JOIN labour_categories lc ON l.category_id = lc.id
-    LEFT JOIN sites s ON l.site_id = s.id
-    WHERE l.is_active = TRUE
+       l.total_advance_taken, l.total_advance_recovered,
+       (l.total_advance_taken - l.total_advance_recovered) as balance_due,
+       lc.category_name, lc.category_code,
+       lc.company_rate_8hr, lc.our_rate_8hr, lc.khoraki_rate,
+       s.site_name
+FROM labour l
+LEFT JOIN labour_categories lc ON l.category_id = lc.id
+LEFT JOIN sites s ON l.site_id = s.id
+WHERE l.is_active = TRUE
   `;
   const params = [];
 

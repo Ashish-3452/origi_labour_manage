@@ -183,6 +183,8 @@ const LabourList = () => {
                   <TableCell><strong>Category</strong></TableCell>
                   <TableCell><strong>Site</strong></TableCell>
                   <TableCell><strong>Rate</strong></TableCell>
+                  <TableCell><strong>Advance</strong></TableCell>
+<TableCell><strong>Dues</strong></TableCell>
                   <TableCell><strong>Action</strong></TableCell>
                 </TableRow>
               </TableHead>
@@ -202,6 +204,11 @@ const LabourList = () => {
                     </TableCell>
                     <TableCell>{lab.site_name}</TableCell>
                     <TableCell>₹{lab.our_rate_8hr || '-'}</TableCell>
+                    <TableCell>₹{Number(lab.total_advance_taken || 0).toLocaleString()}</TableCell>
+<TableCell>
+  ₹{Number(lab.balance_due || 0).toLocaleString()}
+  {Number(lab.balance_due) > 0 ? ' (Dues)' : ' (Settled)'}
+</TableCell>
                     <TableCell>
   <IconButton size="small" color="primary" onClick={() => handleViewDetails(lab)}>
     <Visibility />
@@ -214,7 +221,7 @@ const LabourList = () => {
                 ))}
                 {labour.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">No labour found</TableCell>
+                    <TableCell colSpan={10} align="center">No labour found</TableCell>
                   </TableRow>
                 )}
               </TableBody>
