@@ -124,12 +124,27 @@ const MarkAttendance = () => {
                 <TableCell>{att.overtime_hours}</TableCell>
                 <TableCell>{att.is_finalized ? <Lock color="success" /> : <Edit color="warning" />}</TableCell>
                 <TableCell>
-                  {att.is_finalized ? (
-                    <Typography variant="caption" color="text.secondary">Locked</Typography>
-                  ) : (
-                    <Button size="small" variant="outlined" onClick={() => handleFinalize(att)}>Finalize</Button>
-                  )}
-                </TableCell>
+  {att.is_finalized ? (
+    <Typography variant="caption" color="text.secondary">Locked</Typography>
+  ) : (
+    <>
+      {/* Present/Absent quick toggle */}
+      <Button
+        size="small"
+        color={att.status === 'absent' ? 'error' : 'success'}
+        variant="outlined"
+        onClick={() => handleQuickStatus(att, att.status === 'absent' ? 'present' : 'absent')}
+        sx={{ mr: 0.5 }}
+      >
+        {att.status === 'absent' ? 'Mark Present' : 'Mark Absent'}
+      </Button>
+      {/* Finalize button */}
+      <Button size="small" variant="contained" onClick={() => handleFinalize(att)}>
+        Finalize
+      </Button>
+    </>
+  )}
+</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -137,6 +152,23 @@ const MarkAttendance = () => {
       </TableContainer>
     );
   };
+
+const handleQuickStatus = async (att, newStatus) => {
+  setLoading(true);
+  try {
+    await api.put('/attendance/update-status', {
+      labour_id: att.labour_id,
+      date: attendanceDate,
+      status: newStatus,
+    });
+    loadAttendanceList(); // Refresh list
+    setSuccess(`Status updated to ${newStatus}`);
+  } catch (err) {
+    setError(err.response?.data?.error || 'Status update failed');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>

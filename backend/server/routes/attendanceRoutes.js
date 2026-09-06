@@ -110,4 +110,19 @@ router.get('/list', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'
   }
 });
 
+// Quick Update Status (Present/Absent) without finalizing
+router.put('/update-status', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'), async (req, res) => {
+  try {
+    const { labour_id, date, status } = req.body;
+    const { pool } = require('../config/database');
+    await pool.query(
+      'UPDATE attendance SET status = ? WHERE labour_id = ? AND date = ? AND is_finalized = FALSE',
+      [status, labour_id, date]
+    );
+    res.json({ success: true, message: 'Status updated!' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;
