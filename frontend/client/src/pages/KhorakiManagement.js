@@ -1,148 +1,186 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Paper, Typography, Grid, TextField, MenuItem, Button,
-  Alert, CircularProgress, Card, CardContent
+  Alert, CircularProgress, Table, TableBody, TableCell,
+  TableContainer, TableHead, TableRow
 } from '@mui/material';
-import { Restaurant } from '@mui/icons-material';
-import { labourAPI } from '../services/api';
+import { Restaurant, Save } from '@mui/icons-material';
+import { siteAPI } from '../services/api';
 import api from '../services/api';
 
 const KhorakiManagement = () => {
+  const [sites, setSites] = useState([]);
+  const [selectedSite, setSelectedSite] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [labourList, setLabourList] = useState([]);
-  const [selectedLabour, setSelectedLabour] = useState('');
-  const [weekStart, setWeekStart] = useState('');
-  const [weekEnd, setWeekEnd] = useState('');
-  const [amount, setAmount] = useState('');
-  const [advanceDeduct, setAdvanceDeduct] = useState(0);
+  const [amounts, setAmounts] = useState({});
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const load = async () => {
-      const res = await labourAPI.getAll();
-      setLabourList(res.data.data);
-    };
-    load();
+    siteAPI.getAll().then(res => setSites(res.data.data));
   }, []);
 
-  const handlePay = async (e) => {
-    e.preventDefault();
-    
-    if (!selectedLabour || !weekStart || !weekEnd || !amount) {
-      setError('Labour, Week dates aur Amount required hain');
-      return;
-    }
-
-    const netPayable = parseFloat(amount) - parseFloat(advanceDeduct || 0);
-
+  const loadLabourList = async () => {
+    if (!selectedSite || !selectedDate) return;
     setLoading(true);
     setError('');
-    setSuccess('');
-
     try {
-      const res = await api.post('/khoraki/pay', {
-        labour_id: selectedLabour,
-        week_start: weekStart,
-        week_end: weekEnd,
-        amount: parseFloat(amount),
-        advance_deducted: parseFloat(advanceDeduct || 0)
+      const res = await api.get('/khoraki/labour-list', {
+        params: { site_id: selectedSite, date: selectedDate }
       });
-
-      setSuccess(`Khoraki paid! Receipt: ${res.data.receipt_no}`);
-      setAmount('');
-      setAdvanceDeduct(0);
+      setLabourList(res.data.data);
+      
+      // Prefill amounts if already entered
+      const prefill = {};
+      res.data.data.forEach(l => {
+        if (l.existing_amount) prefill[l.id] = l.existing_amount;
+      });
+      setAmounts(prefill);
     } catch (err) {
-      setError(err.response?.data?.error || 'Payment failed');
+      setError('Labour list load failed');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleAmountChange = (labourId, value) => {
+    setAmounts(prev => ({ ...prev, [labourId]: value }));
+  };
+
+  const handleSaveAll = async () => {
+    if (!selectedSite || !selectedDate) {
+      setError('Site aur Date select karo');
+      return;
+    }
+
+    const entries = labourList
+      .filter(l => amounts[l.id] !== undefined && amounts[l.id] !== '')
+      .map(l => ({
+        labour_id: l.id,
+        amount: amounts[l.id]
+      }));
+
+    if (entries.length === 0) {
+      setError('Kisi labour ka amount enter karo');
+      return;
+    }
+
+    setSaving(true);
+    setError('');
+    setSuccess('');
+    try {
+      const res = await api.post('/khoraki/batch-save', {
+        site_id: selectedSite,
+        date: selectedDate,
+        entries
+      });
+      setSuccess(res.data.message);
+      loadLabourList(); // Refresh
+    } catch (err) {
+      setError(err.response?.data?.error || 'Save failed');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
-      <Paper sx={{ maxWidth: 600, mx: 'auto', p: { xs: 2, sm: 3 }, borderRadius: 3 }}>
+      <Paper sx={{ maxWidth: 900, mx: 'auto', p: { xs: 2, sm: 3 }, borderRadius: 3 }}>
         
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Restaurant sx={{ fontSize: 30, color: '#1976d2', mr: 1 }} />
-          <Typography variant="h5" fontWeight="bold">Khoraki Payment</Typography>
+          <Typography variant="h5" fontWeight="bold">Khoraki Entry (Batch)</Typography>
         </Box>
 
         {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
         {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
 
-        <form onSubmit={handlePay}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth select label="Select Labour" required
-                value={selectedLabour}
-                onChange={(e) => setSelectedLabour(e.target.value)}
-              >
-                <MenuItem value="">Select Labour</MenuItem>
-                {labourList.map(l => (
-                  <MenuItem key={l.id} value={l.id}>
-                    {l.name} ({l.labour_code})
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-
-            <Grid item xs={6}>
-              <TextField
-                fullWidth type="date" label="Week Start" required
-                value={weekStart}
-                onChange={(e) => setWeekStart(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth type="date" label="Week End" required
-                value={weekEnd}
-                onChange={(e) => setWeekEnd(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth type="number" label="Amount (₹)" required
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="1000"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth type="number" label="Advance Deduction (₹)"
-                value={advanceDeduct}
-                onChange={(e) => setAdvanceDeduct(e.target.value)}
-                placeholder="0"
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Card sx={{ bgcolor: '#f0f8ff', p: 1 }}>
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary">Net Payable</Typography>
-                  <Typography variant="h5" color="primary" fontWeight="bold">
-                    ₹{(parseFloat(amount || 0) - parseFloat(advanceDeduct || 0)).toLocaleString()}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Button
-                type="submit" variant="contained" fullWidth size="large"
-                disabled={loading} sx={{ py: 1.5, borderRadius: 2 }}
-              >
-                {loading ? <CircularProgress size={24} color="inherit" /> : '💰 Pay Khoraki'}
-              </Button>
-            </Grid>
+        {/* Site & Date Selection */}
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={12} sm={5}>
+            <TextField
+              fullWidth select label="Select Site" required
+              value={selectedSite}
+              onChange={(e) => setSelectedSite(e.target.value)}
+            >
+              <MenuItem value="">Select Site</MenuItem>
+              {sites.map(s => (
+                <MenuItem key={s.id} value={s.id}>{s.site_name}</MenuItem>
+              ))}
+            </TextField>
           </Grid>
-        </form>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth type="date" label="Date" required
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <Button
+              fullWidth variant="outlined" onClick={loadLabourList}
+              disabled={!selectedSite || loading} sx={{ py: 1.5 }}
+            >
+              {loading ? <CircularProgress size={24} /> : '🔍 Load Labour'}
+            </Button>
+          </Grid>
+        </Grid>
+
+        {/* Labour List with Khoraki Entry */}
+        {labourList.length > 0 && (
+          <>
+            <TableContainer sx={{ overflowX: 'auto', mb: 3 }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow sx={{ bgcolor: '#f5f5f5' }}>
+                    <TableCell>#</TableCell>
+                    <TableCell>Code</TableCell>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Category</TableCell>
+                    <TableCell>Khoraki Amount (₹)</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {labourList.map((lab, index) => (
+                    <TableRow key={lab.id} hover>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{lab.labour_code}</TableCell>
+                      <TableCell>{lab.name}</TableCell>
+                      <TableCell>{lab.category_name}</TableCell>
+                      <TableCell>
+                        <TextField
+                          size="small" type="number"
+                          value={amounts[lab.id] || ''}
+                          onChange={(e) => handleAmountChange(lab.id, e.target.value)}
+                          placeholder="1000"
+                          sx={{ width: 120 }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Button
+              variant="contained" fullWidth size="large"
+              startIcon={<Save />} onClick={handleSaveAll}
+              disabled={saving} sx={{ py: 1.5, borderRadius: 2 }}
+            >
+              {saving ? <CircularProgress size={24} color="inherit" /> : '💾 Save All Khoraki'}
+            </Button>
+          </>
+        )}
+
+        {labourList.length === 0 && selectedSite && !loading && (
+          <Typography align="center" color="text.secondary">
+            No active labour found for this site
+          </Typography>
+        )}
       </Paper>
     </Box>
   );
