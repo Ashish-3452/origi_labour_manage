@@ -12,7 +12,7 @@ const KhorakiManagement = () => {
   const [selectedLabour, setSelectedLabour] = useState('');
   const [weekStart, setWeekStart] = useState('');
   const [weekEnd, setWeekEnd] = useState('');
-  const [result, setResult] = useState(null);
+  const [amount, setAmount] = useState('');
   const [advanceDeduct, setAdvanceDeduct] = useState(0);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
@@ -26,101 +26,123 @@ const KhorakiManagement = () => {
     load();
   }, []);
 
-  const handleCalculate = async () => {
-    if (!selectedLabour || !weekStart || !weekEnd) {
-      setError('Please select labour and week range');
+  const handlePay = async (e) => {
+    e.preventDefault();
+    
+    if (!selectedLabour || !weekStart || !weekEnd || !amount) {
+      setError('Labour, Week dates aur Amount required hain');
       return;
     }
-    setLoading(true);
-    try {
-      const res = await api.post('/khoraki/process', {
-        labour_id: selectedLabour, week_start: weekStart, week_end: weekEnd
-      });
-      setResult(res.data.data);
-      setError('');
-    } catch (err) {
-      setError(err.response?.data?.error || 'Error');
-    }
-    setLoading(false);
-  };
 
-  const handlePay = async () => {
+    const netPayable = parseFloat(amount) - parseFloat(advanceDeduct || 0);
+
     setLoading(true);
+    setError('');
+    setSuccess('');
+
     try {
-      const netPayable = result.total_khoraki - parseFloat(advanceDeduct || 0);
       const res = await api.post('/khoraki/pay', {
-        labour_id: selectedLabour, week_start: weekStart, week_end: weekEnd,
-        total_khoraki: result.total_khoraki,
-        advance_deducted: parseFloat(advanceDeduct || 0),
-        net_payable: netPayable
+        labour_id: selectedLabour,
+        week_start: weekStart,
+        week_end: weekEnd,
+        amount: parseFloat(amount),
+        advance_deducted: parseFloat(advanceDeduct || 0)
       });
+
       setSuccess(`Khoraki paid! Receipt: ${res.data.receipt_no}`);
-      setResult(null);
+      setAmount('');
+      setAdvanceDeduct(0);
     } catch (err) {
       setError(err.response?.data?.error || 'Payment failed');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
-    <Box sx={{ p: 3, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
-      <Paper sx={{ maxWidth: 600, mx: 'auto', p: 3, borderRadius: 3 }}>
+    <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
+      <Paper sx={{ maxWidth: 600, mx: 'auto', p: { xs: 2, sm: 3 }, borderRadius: 3 }}>
+        
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Restaurant sx={{ fontSize: 30, color: '#1976d2', mr: 1 }} />
-          <Typography variant="h5" fontWeight="bold">Khoraki Management</Typography>
+          <Typography variant="h5" fontWeight="bold">Khoraki Payment</Typography>
         </Box>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+        {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
 
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField fullWidth select label="Select Labour" value={selectedLabour}
-              onChange={(e) => setSelectedLabour(e.target.value)}>
-              <MenuItem value="">Select Labour</MenuItem>
-              {labourList.map(l => (
-                <MenuItem key={l.id} value={l.id}>{l.name} ({l.labour_code})</MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={6}>
-            <TextField fullWidth type="date" label="Week Start" value={weekStart}
-              onChange={(e) => setWeekStart(e.target.value)}
-              InputLabelProps={{ shrink: true }} />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField fullWidth type="date" label="Week End" value={weekEnd}
-              onChange={(e) => setWeekEnd(e.target.value)}
-              InputLabelProps={{ shrink: true }} />
-          </Grid>
-          <Grid item xs={12}>
-            <Button fullWidth variant="outlined" onClick={handleCalculate} disabled={loading}>
-              {loading ? <CircularProgress size={24} /> : '📊 Calculate Khoraki'}
-            </Button>
-          </Grid>
-        </Grid>
+        <form onSubmit={handlePay}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth select label="Select Labour" required
+                value={selectedLabour}
+                onChange={(e) => setSelectedLabour(e.target.value)}
+              >
+                <MenuItem value="">Select Labour</MenuItem>
+                {labourList.map(l => (
+                  <MenuItem key={l.id} value={l.id}>
+                    {l.name} ({l.labour_code})
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
 
-        {result && (
-          <Card sx={{ mt: 3, p: 2, bgcolor: '#f0f8ff' }}>
-            <Typography variant="h6">Khoraki Details</Typography>
-            <Typography>Total Hajri: <strong>{result.total_hajri}</strong></Typography>
-            <Typography>Rate: <strong>₹{result.khoraki_rate}/hajri</strong></Typography>
-            <Typography variant="h5" color="primary" mt={1}>
-              Total: ₹{result.total_khoraki}
-            </Typography>
-            
-            <TextField fullWidth label="Advance Deduction" type="number" sx={{ mt: 2 }}
-              value={advanceDeduct} onChange={(e) => setAdvanceDeduct(e.target.value)} />
-            
-            <Typography variant="h6" mt={1} color="success.main">
-              Net Payable: ₹{result.total_khoraki - parseFloat(advanceDeduct || 0)}
-            </Typography>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth type="date" label="Week Start" required
+                value={weekStart}
+                onChange={(e) => setWeekStart(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth type="date" label="Week End" required
+                value={weekEnd}
+                onChange={(e) => setWeekEnd(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
 
-            <Button fullWidth variant="contained" onClick={handlePay} disabled={loading} sx={{ mt: 2 }}>
-              ✅ Pay Khoraki
-            </Button>
-          </Card>
-        )}
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth type="number" label="Amount (₹)" required
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="1000"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth type="number" label="Advance Deduction (₹)"
+                value={advanceDeduct}
+                onChange={(e) => setAdvanceDeduct(e.target.value)}
+                placeholder="0"
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Card sx={{ bgcolor: '#f0f8ff', p: 1 }}>
+                <CardContent>
+                  <Typography variant="body2" color="text.secondary">Net Payable</Typography>
+                  <Typography variant="h5" color="primary" fontWeight="bold">
+                    ₹{(parseFloat(amount || 0) - parseFloat(advanceDeduct || 0)).toLocaleString()}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Button
+                type="submit" variant="contained" fullWidth size="large"
+                disabled={loading} sx={{ py: 1.5, borderRadius: 2 }}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : '💰 Pay Khoraki'}
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
       </Paper>
     </Box>
   );

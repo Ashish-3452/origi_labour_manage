@@ -39,9 +39,11 @@ class Labour {
     }
   }
 
-  static generateCode() {
-    return `LAB${Math.floor(1000 + Math.random() * 9000)}`;
-  }
+  static async generateSerialCode() {
+  const [rows] = await pool.query('SELECT MAX(id) as maxId FROM labour');
+  const nextId = (rows[0].maxId || 0) + 1;
+  return `LAB${String(nextId).padStart(3, '0')}`;
+}
 
   static async create(labourData) {
     const { name, mobile, aadhar_no, address, category_id, site_id, emergency_contact } = labourData;
@@ -55,7 +57,8 @@ class Labour {
     throw new Error('Labour already registered with same mobile or name!');
   }
 
-    const labour_code = this.generateCode();
+    
+    const labour_code = await this.generateSerialCode();
     
     const [result] = await pool.query(
       `INSERT INTO labour (labour_code, name, mobile, aadhar_no, address, category_id, site_id, emergency_contact) 

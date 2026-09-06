@@ -19,7 +19,7 @@ const ActivityLog = require('./models/ActivityLog');
 const errorHandler = require('./middleware/errorHandler');
 const Otp = require('./models/Otp');
 const LabourSiteRate = require('./models/LabourSiteRate');
-
+const SiteCategoryRate = require('./models/SiteCategoryRate');
 
 // Load environment variables
 dotenv.config();
@@ -108,6 +108,7 @@ const startServer = async () => {
       await ActivityLog.createTable();
       await Otp.createTable();
       await LabourSiteRate.createTable();
+      await SiteCategoryRate.createTable();
       
 
       

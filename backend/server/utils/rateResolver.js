@@ -1,10 +1,17 @@
-const LabourSiteRate = require('../models/LabourSiteRate');
+const SiteCategoryRate = require('../models/SiteCategoryRate');
 const { pool } = require('../config/database');
 
 const getLabourRate = async (labour_id, site_id) => {
-  // Pehle site-specific rate check karo
-  const siteRate = await LabourSiteRate.getRate(labour_id, site_id);
-  
+  // Pehle labour ki category nikalo
+  const [labourRows] = await pool.query(
+    'SELECT category_id FROM labour WHERE id = ?',
+    [labour_id]
+  );
+  if (!labourRows.length) throw new Error('Labour not found');
+  const category_id = labourRows[0].category_id;
+
+  // Site-category rate check karo
+  const siteRate = await SiteCategoryRate.getRate(site_id, category_id);
   if (siteRate) {
     return {
       company_rate_8hr: siteRate.company_rate_8hr,
@@ -13,18 +20,15 @@ const getLabourRate = async (labour_id, site_id) => {
       our_ot_rate_hr: siteRate.our_ot_rate_hr
     };
   }
-  
-  // Fallback to category default rate
-  const [rows] = await pool.query(
-    `SELECT lc.company_rate_8hr, lc.company_ot_rate_hr,
-            lc.our_rate_8hr, lc.our_ot_rate_hr
-     FROM labour l
-     JOIN labour_categories lc ON l.category_id = lc.id
-     WHERE l.id = ?`,
-    [labour_id]
+
+  // Fallback to category default
+  const [catRows] = await pool.query(
+    `SELECT company_rate_8hr, company_ot_rate_hr, our_rate_8hr, our_ot_rate_hr
+     FROM labour_categories WHERE id = ?`,
+    [category_id]
   );
-  
-  return rows[0];
+  if (!catRows.length) throw new Error('Category rate not found');
+  return catRows[0];
 };
 
 module.exports = { getLabourRate };

@@ -153,4 +153,25 @@ router.get('/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR')
   }
 });
 
+// Site Category Rate APIs
+router.post('/site-category-rate', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+  try {
+    const SiteCategoryRate = require('../models/SiteCategoryRate');
+    await SiteCategoryRate.saveRate(req.body);
+    res.json({ success: true, message: 'Category rate saved!' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/site-category-rates/:siteId', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+  try {
+    const SiteCategoryRate = require('../models/SiteCategoryRate');
+    const rates = await SiteCategoryRate.getRatesBySite(req.params.siteId);
+    res.json({ success: true, data: rates });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
