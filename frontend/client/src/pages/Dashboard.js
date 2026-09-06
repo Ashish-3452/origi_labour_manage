@@ -84,11 +84,12 @@ const [pendingFinal, setPendingFinal] = useState([]);
   ];
 
   const statsCards = [
-    { title: 'Total Labour', value: stats.total_labour, color: '#1976d2', icon: <People /> },
-    { title: 'Present Today', value: stats.present_today, color: '#4caf50', icon: <Assignment /> },
-    { title: "Today's Profit", value: `₹${(stats.today_profit || 0).toLocaleString()}`, color: '#ff9800', icon: <Payment /> },
-    { title: 'Outstanding', value: `₹${(stats.total_outstanding || 0).toLocaleString()}`, color: '#f44336', icon: <Assessment /> },
-  ];
+  { title: 'Total Labour', value: stats.total_labour, color: '#1976d2', icon: <People /> },
+  { title: 'Present Today', value: stats.present_today, color: '#4caf50', icon: <Assignment /> },
+  { title: 'Absent Today', value: stats.absent_today || 0, color: '#f44336', icon: <Assignment /> },
+  { title: "Today's Profit", value: `₹${(stats.today_profit || 0).toLocaleString()}`, color: '#ff9800', icon: <Payment /> },
+  { title: 'Outstanding', value: `₹${(stats.total_outstanding || 0).toLocaleString()}`, color: '#f44336', icon: <Assessment /> },
+];
 
   const drawer = (
     <Box sx={{
