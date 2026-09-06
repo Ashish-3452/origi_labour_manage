@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   Box, AppBar, Toolbar, Typography, Drawer, List, ListItem,
   ListItemIcon, ListItemText, Card, CardContent, Grid, IconButton,
-  Avatar, Divider, Badge
+  Avatar, Divider, Badge, Table, TableBody, TableCell,
+  TableContainer, TableHead, TableRow
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon, People, TrendingDown, Assignment, Payment,
@@ -27,6 +28,8 @@ const Dashboard = () => {
     total_outstanding: 0,
     today_hajri: 0
   });
+  const [siteWise, setSiteWise] = useState([]);
+const [pendingFinal, setPendingFinal] = useState([]);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -41,13 +44,19 @@ const Dashboard = () => {
   }, [navigate]);
 
   const loadDashboardStats = async () => {
-    try {
-      const res = await api.get('/dashboard/stats');
-      if (res.data.success) setStats(res.data.data);
-    } catch (err) {
-      console.error('Stats load error:', err);
-    }
-  };
+  try {
+    const [statsRes, siteRes, pendingRes] = await Promise.all([
+      api.get('/dashboard/stats'),
+      api.get('/dashboard/site-wise'),
+      api.get('/dashboard/pending-finalization')
+    ]);
+    if (statsRes.data.success) setStats(statsRes.data.data);
+    if (siteRes.data.success) setSiteWise(siteRes.data.data);
+    if (pendingRes.data.success) setPendingFinal(pendingRes.data.data);
+  } catch (err) {
+    console.error('Stats load error:', err);
+  }
+};
 
   const handleLogout = () => {
     localStorage.clear();
@@ -320,6 +329,69 @@ const Dashboard = () => {
             Profit: <strong>₹{(stats.today_profit || 0).toLocaleString()}</strong>
           </Typography>
         </Card>
+
+        {/* Site-wise Attendance Summary */}
+<Card sx={{ mt: 3, borderRadius: 3, p: { xs: 2, sm: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+  <Typography variant="h6" fontWeight="bold" mb={2}>🏢 Site-wise Attendance (Today)</Typography>
+  <TableContainer sx={{ overflowX: 'auto' }}>
+    <Table size="small">
+      <TableHead>
+        <TableRow sx={{ bgcolor: '#f5f5f5' }}>
+          <TableCell>Site</TableCell>
+          <TableCell>Present</TableCell>
+          <TableCell>Half Day</TableCell>
+          <TableCell>Absent</TableCell>
+          <TableCell>Pending Finalize</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {siteWise.map(site => (
+          <TableRow key={site.id}>
+            <TableCell>{site.site_name}</TableCell>
+            <TableCell sx={{ color: 'success.main', fontWeight: 'bold' }}>{site.present || 0}</TableCell>
+            <TableCell sx={{ color: 'warning.main' }}>{site.half_day || 0}</TableCell>
+            <TableCell sx={{ color: 'error.main' }}>{site.absent || 0}</TableCell>
+            <TableCell sx={{ color: site.pending_finalize > 0 ? 'error.main' : 'text.secondary' }}>
+              {site.pending_finalize || 0}
+            </TableCell>
+          </TableRow>
+        ))}
+        {siteWise.length === 0 && (
+          <TableRow><TableCell colSpan={5} align="center">No data</TableCell></TableRow>
+        )}
+      </TableBody>
+    </Table>
+  </TableContainer>
+</Card>
+
+{/* Pending Finalization Alerts */}
+{pendingFinal.length > 0 && (
+  <Card sx={{ mt: 3, borderRadius: 3, p: { xs: 2, sm: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)', bgcolor: '#fff3e0' }}>
+    <Typography variant="h6" fontWeight="bold" mb={2} color="warning.main">
+      ⚠️ Pending Finalization
+    </Typography>
+    <TableContainer sx={{ overflowX: 'auto' }}>
+      <Table size="small">
+        <TableHead>
+          <TableRow sx={{ bgcolor: '#ffe0b2' }}>
+            <TableCell>Date</TableCell>
+            <TableCell>Site</TableCell>
+            <TableCell>Pending Count</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {pendingFinal.map((p, idx) => (
+            <TableRow key={idx}>
+              <TableCell>{new Date(p.date).toLocaleDateString('hi-IN')}</TableCell>
+              <TableCell>{p.site_name}</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'error.main' }}>{p.pending_count}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </Card>
+)}
 
         <Grid container spacing={2} sx={{ mt: 2 }}>
           {[
