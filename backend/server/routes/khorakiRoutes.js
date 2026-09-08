@@ -3,7 +3,7 @@ const router = express.Router();
 const { authenticate, authorize } = require('../middleware/auth');
 const { pool } = require('../config/database');
 
-// Get labour list for khoraki entry (by site)
+// Get labour list for khoraki entry (by site and date)
 router.get('/labour-list', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'), async (req, res) => {
   try {
     const { site_id, date } = req.query;
@@ -36,7 +36,6 @@ router.post('/batch-save', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPE
 
     const receipt_no_prefix = 'KHO-' + Date.now().toString(36).toUpperCase();
     let savedCount = 0;
-    let updatedCount = 0;
 
     for (let i = 0; i < entries.length; i++) {
       const { labour_id, amount } = entries[i];
@@ -49,7 +48,7 @@ router.post('/batch-save', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPE
       // Upsert khoraki entry (same date + labour = update, else insert)
       await pool.query(
         `INSERT INTO khoraki (labour_id, week_start, week_end, total_khoraki, advance_deducted, net_payable, paid_date, receipt_no, status)
-         VALUES (?, ?, ?, ?, 0, ?, ?, ?, 'PAID')
+         VALUES (?, ?, ?, ?, 0, ?, CURDATE(), ?, 'PAID')
          ON DUPLICATE KEY UPDATE
            total_khoraki = VALUES(total_khoraki),
            net_payable = VALUES(net_payable),
