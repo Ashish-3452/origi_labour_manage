@@ -149,3 +149,36 @@ body {
     width: 100% !important; 
   }
 }
+
+/* ============ TOP DUES AUTO SLIDER ============ */
+@keyframes slideLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+.slider-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.slider-track {
+  display: flex;
+  gap: 16px;
+  animation: slideLeft 25s linear infinite;
+}
+
+.slider-track:hover {
+  animation-play-state: paused;
+}
+
+.slider-card {
+  min-width: 200px;
+  flex-shrink: 0;
+}
+
+/* Refresh button spin animation */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

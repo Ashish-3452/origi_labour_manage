@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import {
   Box, Paper, Typography, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Button, TextField,
   MenuItem, Grid, Chip, IconButton, Dialog, DialogContent,
   DialogTitle, CircularProgress, Tabs, Tab
 } from '@mui/material';
-import { Add, Search, Visibility, Close } from '@mui/icons-material';
+import { Add, Search, Visibility, Close,FileDownload,PictureAsPdf } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { labourAPI, categoryAPI, siteAPI } from '../services/api';
 
@@ -106,6 +109,76 @@ const LabourList = () => {
   }
 };
 
+const handleExportExcel = () => {
+  if (labour.length === 0) {
+    alert('No data to export');
+    return;
+  }
+
+  const exportData = labour.map((lab, idx) => ({
+    'S.No': idx + 1,
+    'Code': lab.labour_code,
+    'Name': lab.name,
+    'Mobile': lab.mobile || '-',
+    'Category': lab.category_name,
+    'Site': lab.site_name,
+    'Our Rate': lab.our_rate_8hr || 0,
+    'Advance': lab.total_advance_taken || 0,
+    'Dues': lab.balance_due || 0,
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(exportData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Labour');
+
+  const filename = `Labour_List_${new Date().toISOString().split('T')[0]}.xlsx`;
+  XLSX.writeFile(wb, filename);
+};
+
+const handleExportPDF = () => {
+  if (labour.length === 0) {
+    alert('No data to export');
+    return;
+  }
+
+  const doc = new jsPDF();
+
+  // Header
+  doc.setFontSize(16);
+  doc.setTextColor(26, 35, 126);
+  doc.text('LabourBhai - Labour List', 14, 15);
+
+  doc.setFontSize(10);
+  doc.setTextColor(80);
+  doc.text(`Total Active Labour: ${totalActive}`, 14, 22);
+  doc.text(`Generated: ${new Date().toLocaleString('hi-IN')}`, 14, 27);
+
+  // Table
+  const tableData = labour.map((lab, idx) => [
+    idx + 1,
+    lab.labour_code,
+    lab.name,
+    lab.mobile || '-',
+    lab.category_name,
+    lab.site_name,
+    `Rs.${lab.our_rate_8hr || 0}`,
+    `Rs.${Number(lab.total_advance_taken || 0).toLocaleString()}`,
+    `Rs.${Number(lab.balance_due || 0).toLocaleString()}`,
+  ]);
+
+  doc.autoTable({
+    startY: 32,
+    head: [['#', 'Code', 'Name', 'Mobile', 'Category', 'Site', 'Rate', 'Advance', 'Dues']],
+    body: tableData,
+    theme: 'grid',
+    headStyles: { fillColor: [26, 35, 126], textColor: 255, fontSize: 9 },
+    bodyStyles: { fontSize: 8 },
+    alternateRowStyles: { fillColor: [245, 245, 245] },
+  });
+
+  doc.save(`Labour_List_${new Date().toISOString().split('T')[0]}.pdf`);
+};
+
   const getCategoryColor = (code) => {
     const colors = { MAN: '#1976d2', LAD: '#e91e63', MAS: '#ff9800', CAR: '#795548' };
     return colors[code] || '#666';
@@ -115,12 +188,33 @@ const LabourList = () => {
     <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
       <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 1 }}>
-          <Typography variant="h5" fontWeight="bold">👥 Labour List</Typography>
-          <Button variant="contained" startIcon={<Add />} onClick={() => navigate('/labour/register')}>
-            Add Labour
-          </Button>
-        </Box>
+  <Typography variant="h5" fontWeight="bold">👥 Labour List</Typography>
+  
+<Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+  <Button
+    variant="contained"
+    color="success"
+    startIcon={<FileDownload />}
+    onClick={handleExportExcel}
+    disabled={labour.length === 0}
+  >
+    Excel
+  </Button>
+  <Button
+    variant="contained"
+    color="error"
+    startIcon={<PictureAsPdf />}
+    onClick={handleExportPDF}
+    disabled={labour.length === 0}
+  >
+    PDF
+  </Button>
+  <Button variant="contained" startIcon={<Add />} onClick={() => navigate('/labour/register')}>
+    Add Labour
+  </Button>
+</Box>
 
+</Box>
         {tab === 0 && (
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid item xs={12} sm={4}>

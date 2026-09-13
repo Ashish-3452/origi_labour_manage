@@ -125,4 +125,40 @@ router.put('/update-status', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SU
   }
 });
 
+// Get full attendance report for a date & site
+router.get('/report', authenticate, authorize('SUPER_ADMIN', 'ADMIN', 'SUPERVISOR'), async (req, res) => {
+  try {
+    const { date, site_id } = req.query;
+    
+    const { pool } = require('../config/database');
+    
+    const [report] = await pool.query(
+      `SELECT l.id, l.labour_code, l.name, lc.category_name,
+              a.status, a.regular_hours, a.overtime_hours, a.total_hajri,
+              a.is_finalized, a.remarks
+       FROM labour l
+       JOIN labour_categories lc ON l.category_id = lc.id
+       LEFT JOIN attendance a ON a.labour_id = l.id AND a.date = ?
+       WHERE l.is_active = TRUE AND l.site_id = ?
+       ORDER BY l.name ASC`,
+      [date, site_id]
+    );
+
+    // Summary counts
+    const summary = {
+      total: report.length,
+      present: report.filter(r => r.status === 'present').length,
+      half_day: report.filter(r => r.status === 'half_day').length,
+      absent: report.filter(r => r.status === 'absent').length,
+      unmarked: report.filter(r => !r.status).length,
+      finalized: report.filter(r => r.is_finalized).length,
+      pending_finalize: report.filter(r => r.status && !r.is_finalized).length
+    };
+
+    res.json({ success: true, data: report, summary });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;

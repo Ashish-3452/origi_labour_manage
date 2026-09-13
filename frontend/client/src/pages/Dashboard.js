@@ -3,13 +3,13 @@ import {
   Box, AppBar, Toolbar, Typography, Drawer, List, ListItem,
   ListItemIcon, ListItemText, Card, CardContent, Grid, IconButton,
   Avatar, Divider, Badge, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow
+  TableContainer, TableHead, TableRow, Menu, MenuItem, Chip
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon, People, TrendingDown, Assignment, Payment,
   Restaurant, Settings, Menu as MenuIcon,
   Logout, Notifications, TrendingUp, Business, PersonAdd, Calculate, PictureAsPdf,
-  SupervisorAccount, Category, History, Assessment
+  SupervisorAccount, Category, History, Assessment,Refresh
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -28,6 +28,35 @@ const Dashboard = () => {
     total_outstanding: 0,
     today_hajri: 0
   });
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+const [notifAnchor, setNotifAnchor] = useState(null);
+
+const handleRefresh = async () => {
+  setRefreshing(true);
+  await loadDashboardStats();
+  setRefreshing(false);
+};
+
+const loadNotifications = async () => {
+  try {
+    const res = await api.get('/dashboard/notifications');
+    if (res.data.success) setNotifications(res.data.data);
+  } catch (err) {
+    console.error('Notifications load error:', err);
+  }
+};
+
+const handleNotifOpen = (e) => {
+  setNotifAnchor(e.currentTarget);
+  loadNotifications();
+};
+
+const handleNotifClose = () => {
+  setNotifAnchor(null);
+};
+
   const [siteWise, setSiteWise] = useState([]);
 const [pendingFinal, setPendingFinal] = useState([]);
 
@@ -45,14 +74,18 @@ const [pendingFinal, setPendingFinal] = useState([]);
 
   const loadDashboardStats = async () => {
   try {
-    const [statsRes, siteRes, pendingRes] = await Promise.all([
+    const [statsRes, siteRes, pendingRes, fullRes, notifRes] = await Promise.all([
       api.get('/dashboard/stats'),
       api.get('/dashboard/site-wise'),
-      api.get('/dashboard/pending-finalization')
+      api.get('/dashboard/pending-finalization'),
+      api.get('/dashboard/full-summary'),
+      api.get('/dashboard/notifications')
     ]);
     if (statsRes.data.success) setStats(statsRes.data.data);
     if (siteRes.data.success) setSiteWise(siteRes.data.data);
     if (pendingRes.data.success) setPendingFinal(pendingRes.data.data);
+    if (fullRes.data.success) setFullSummary(fullRes.data.data);
+    if (notifRes.data.success) setNotifications(notifRes.data.data);
   } catch (err) {
     console.error('Stats load error:', err);
   }
@@ -62,6 +95,13 @@ const [pendingFinal, setPendingFinal] = useState([]);
     localStorage.clear();
     navigate('/');
   };
+
+  const [fullSummary, setFullSummary] = useState({
+  topDuesLabour: [],
+  supervisorSummary: {},
+  profitSummary: {},
+  totalOutstanding: 0
+});
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
@@ -78,6 +118,7 @@ const [pendingFinal, setPendingFinal] = useState([]);
     { text: 'Sites', icon: <Business />, path: '/sites' },
     { text: 'Categories', icon: <Category />, path: '/categories' },
     { text: 'Site Rates', icon: <Business />, path: '/labour/site-rates' },
+    { text: 'Attendance Report', icon: <Assessment />, path: '/attendance/report' },
     { text: 'Users', icon: <People />, path: '/users' },
     { text: 'Activity Log', icon: <History />, path: '/activity' },
     { text: 'Settings', icon: <Settings />, path: '/settings' },
@@ -223,11 +264,60 @@ const [pendingFinal, setPendingFinal] = useState([]);
             })}
           </Typography>
 
-          <IconButton>
-            <Badge badgeContent={stats.present_today || 0} color="success">
-              <Notifications sx={{ color: '#1a237e' }} />
-            </Badge>
-          </IconButton>
+<IconButton onClick={handleRefresh} disabled={refreshing} title="Refresh Data">
+  <Refresh sx={{ color: '#1a237e', animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
+</IconButton>
+
+          <IconButton onClick={handleNotifOpen}>
+  <Badge badgeContent={notifications.length} color="error">
+    <Notifications sx={{ color: '#1a237e' }} />
+  </Badge>
+</IconButton>
+
+<Menu
+  anchorEl={notifAnchor}
+  open={Boolean(notifAnchor)}
+  onClose={handleNotifClose}
+  PaperProps={{
+    sx: { maxWidth: 350, width: '90vw', maxHeight: 400 }
+  }}
+>
+  <Box sx={{ p: 2, bgcolor: '#1a237e', color: 'white' }}>
+    <Typography variant="subtitle1" fontWeight="bold">
+      🔔 Notifications
+    </Typography>
+  </Box>
+  <Divider />
+  {notifications.length === 0 ? (
+    <MenuItem disabled>
+      <ListItemText primary="No notifications" />
+    </MenuItem>
+  ) : (
+    notifications.map((notif, idx) => (
+      <MenuItem key={idx} onClick={handleNotifClose} sx={{ alignItems: 'flex-start', py: 1.5 }}>
+        <Box sx={{ width: '100%' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+            <Typography variant="caption" fontWeight="bold"
+              color={
+                notif.type === 'error' ? 'error.main' :
+                notif.type === 'warning' ? 'warning.main' : 'info.main'
+              }>
+              {notif.title}
+            </Typography>
+            <Chip
+              label={notif.type === 'error' ? 'Alert' : notif.type === 'warning' ? 'Warning' : 'Info'}
+              size="small"
+              color={notif.type === 'error' ? 'error' : notif.type === 'warning' ? 'warning' : 'info'}
+            />
+          </Box>
+          <Typography variant="body2" color="text.secondary">
+            {notif.message}
+          </Typography>
+        </Box>
+      </MenuItem>
+    ))
+  )}
+</Menu>
         </Toolbar>
       </AppBar>
 
@@ -363,6 +453,63 @@ const [pendingFinal, setPendingFinal] = useState([]);
       </TableBody>
     </Table>
   </TableContainer>
+</Card>
+
+{/* Supervisor Financial Summary */}
+<Card sx={{ mt: 3, borderRadius: 3, p: { xs: 2, sm: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+  <Typography variant="h6" fontWeight="bold" mb={2}>👨‍💼 Supervisor Summary</Typography>
+  <Grid container spacing={2}>
+    <Grid item xs={6} sm={3}><Typography variant="body2">Total Supervisors</Typography><Typography variant="h6">{fullSummary.supervisorSummary?.total_supervisors || 0}</Typography></Grid>
+    <Grid item xs={6} sm={3}><Typography variant="body2">Monthly Cost</Typography><Typography variant="h6">₹{Number(fullSummary.supervisorSummary?.total_monthly_cost || 0).toLocaleString()}</Typography></Grid>
+    <Grid item xs={6} sm={3}><Typography variant="body2">Advance Taken</Typography><Typography variant="h6">₹{Number(fullSummary.supervisorSummary?.total_advance_taken || 0).toLocaleString()}</Typography></Grid>
+    <Grid item xs={6} sm={3}><Typography variant="body2">Outstanding</Typography><Typography variant="h6" color="error">₹{Number(fullSummary.supervisorSummary?.outstanding_advance || 0).toLocaleString()}</Typography></Grid>
+  </Grid>
+</Card>
+
+{/* Top 10 Dues Labour Slider */}
+{/* Top 10 Dues Labour Auto Slider */}
+<Card sx={{ mt: 3, borderRadius: 3, p: { xs: 2, sm: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+  <Typography variant="h6" fontWeight="bold" mb={2}>🔝 Top 10 Dues Labour</Typography>
+  <Box className="slider-container">
+    <Box className="slider-track">
+      {/* Original list */}
+      {fullSummary.topDuesLabour?.map((lab, i) => (
+        <Card key={`a-${lab.id}`} className="slider-card" sx={{ bgcolor: '#fff3e0', borderRadius: 2 }}>
+          <CardContent>
+            <Typography variant="caption" color="text.secondary">#{i+1}</Typography>
+            <Typography variant="subtitle2" fontWeight="bold">{lab.name}</Typography>
+            <Typography variant="body2" color="text.secondary">{lab.labour_code} • {lab.category_name}</Typography>
+            <Typography variant="h6" color="error">₹{Number(lab.balance_due).toLocaleString()}</Typography>
+          </CardContent>
+        </Card>
+      ))}
+      {/* Duplicate list for seamless loop */}
+      {fullSummary.topDuesLabour?.map((lab, i) => (
+        <Card key={`b-${lab.id}`} className="slider-card" sx={{ bgcolor: '#fff3e0', borderRadius: 2 }}>
+          <CardContent>
+            <Typography variant="caption" color="text.secondary">#{i+1}</Typography>
+            <Typography variant="subtitle2" fontWeight="bold">{lab.name}</Typography>
+            <Typography variant="body2" color="text.secondary">{lab.labour_code} • {lab.category_name}</Typography>
+            <Typography variant="h6" color="error">₹{Number(lab.balance_due).toLocaleString()}</Typography>
+          </CardContent>
+        </Card>
+      ))}
+    </Box>
+  </Box>
+  {fullSummary.topDuesLabour?.length === 0 && (
+    <Typography variant="body2" color="text.secondary">No dues pending</Typography>
+  )}
+</Card>
+
+{/* Combined Profit Summary */}
+<Card sx={{ mt: 3, borderRadius: 3, p: { xs: 2, sm: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+  <Typography variant="h6" fontWeight="bold" mb={2}>💰 Profit Summary (This Month)</Typography>
+  <Grid container spacing={2}>
+    <Grid item xs={6} sm={3}><Typography variant="body2">Company Bill</Typography><Typography variant="h6">₹{Number(fullSummary.profitSummary?.company_bill || 0).toLocaleString()}</Typography></Grid>
+    <Grid item xs={6} sm={3}><Typography variant="body2">Labour Payment</Typography><Typography variant="h6">₹{Number(fullSummary.profitSummary?.labour_payment || 0).toLocaleString()}</Typography></Grid>
+    <Grid item xs={6} sm={3}><Typography variant="body2">Business Expense</Typography><Typography variant="h6">₹{Number(fullSummary.profitSummary?.business_expense || 0).toLocaleString()}</Typography></Grid>
+    <Grid item xs={6} sm={3}><Typography variant="body2">Total Outstanding</Typography><Typography variant="h6" color="error">₹{Number(fullSummary.totalOutstanding || 0).toLocaleString()}</Typography></Grid>
+  </Grid>
 </Card>
 
 {/* Pending Finalization Alerts */}

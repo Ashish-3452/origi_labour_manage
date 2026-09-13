@@ -21,7 +21,9 @@ import ActivityLog from './pages/ActivityLog';
 import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 import LabourSiteRates from './pages/LabourSiteRates';
+import AttendanceReport from './pages/AttendanceReport';
 import './App.css';
+
 
 const theme = createTheme({
   palette: {
@@ -167,6 +169,13 @@ function App() {
 <Route path="/labour/site-rates" element={
   <ProtectedRoute>
     <LabourSiteRates />
+  </ProtectedRoute>
+} />
+
+// Protected route:
+<Route path="/attendance/report" element={
+  <ProtectedRoute>
+    <AttendanceReport />
   </ProtectedRoute>
 } />
 
