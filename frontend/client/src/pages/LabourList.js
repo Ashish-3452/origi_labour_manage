@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import {
   Box, Paper, Typography, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Button, TextField,
@@ -166,15 +166,15 @@ const handleExportPDF = () => {
     `Rs.${Number(lab.balance_due || 0).toLocaleString()}`,
   ]);
 
-  doc.autoTable({
-    startY: 32,
-    head: [['#', 'Code', 'Name', 'Mobile', 'Category', 'Site', 'Rate', 'Advance', 'Dues']],
-    body: tableData,
-    theme: 'grid',
-    headStyles: { fillColor: [26, 35, 126], textColor: 255, fontSize: 9 },
-    bodyStyles: { fontSize: 8 },
-    alternateRowStyles: { fillColor: [245, 245, 245] },
-  });
+  autoTable(doc, {
+  startY: 32,
+  head: [['#', 'Code', 'Name', 'Mobile', 'Category', 'Site', 'Rate', 'Advance', 'Dues']],
+  body: tableData,
+  theme: 'grid',
+  headStyles: { fillColor: [26, 35, 126], textColor: 255, fontSize: 9 },
+  bodyStyles: { fontSize: 8 },
+  alternateRowStyles: { fillColor: [245, 245, 245] },
+});
 
   doc.save(`Labour_List_${new Date().toISOString().split('T')[0]}.pdf`);
 };
