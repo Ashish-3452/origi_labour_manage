@@ -120,6 +120,7 @@ const [pendingFinal, setPendingFinal] = useState([]);
     { text: 'Site Rates', icon: <Business />, path: '/labour/site-rates' },
     { text: 'Attendance Report', icon: <Assessment />, path: '/attendance/report' },
     { text: 'Users', icon: <People />, path: '/users' },
+    { text: 'Advance History', icon: <History />, path: '/payments/history' },
     { text: 'Activity Log', icon: <History />, path: '/activity' },
     { text: 'Settings', icon: <Settings />, path: '/settings' },
   ];
@@ -240,16 +241,17 @@ const [pendingFinal, setPendingFinal] = useState([]);
           </IconButton>
 
           <Typography
-            variant="h6"
-            fontWeight="bold"
-            sx={{
-              flexGrow: 1,
-              fontSize: { xs: '0.9rem', sm: '1.25rem' },
-              color: '#1a237e'
-            }}
-          >
-            🏗️ {window.innerWidth < 600 ? 'LMS' : 'LabourBhai'}
-          </Typography>
+  variant="h6"
+  fontWeight="bold"
+  sx={{
+    flexGrow: 1,
+    fontSize: { xs: '0.9rem', sm: '1.25rem' },
+    color: '#1a237e'
+  }}
+>
+  🏗️ <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>LabourBhai</Box>
+  <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>LMS</Box>
+</Typography>
 
           <Typography
             variant="body2"
@@ -355,7 +357,7 @@ const [pendingFinal, setPendingFinal] = useState([]);
           mt: 8
         }}
       >
-        <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
+        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
           {statsCards.map((stat, index) => (
             <Grid item xs={6} sm={6} md={3} key={index}>
               <Card sx={{
@@ -407,7 +409,7 @@ const [pendingFinal, setPendingFinal] = useState([]);
         <Card sx={{
           mt: 3,
           borderRadius: 3,
-          p: { xs: 2, sm: 3 },
+          p: { xs: 1, sm: 2, md: 3 },
           boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
           background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)'
         }}>
@@ -422,7 +424,7 @@ const [pendingFinal, setPendingFinal] = useState([]);
         </Card>
 
         {/* Site-wise Attendance Summary */}
-<Card sx={{ mt: 3, borderRadius: 3, p: { xs: 2, sm: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+<Card sx={{ mt: 3, borderRadius: 3, p: { xs: 1, sm: 2, md: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
   <Typography variant="h6" fontWeight="bold" mb={2}>🏢 Site-wise Attendance (Today)</Typography>
   <TableContainer sx={{ overflowX: 'auto' }}>
     <Table size="small">
@@ -456,7 +458,7 @@ const [pendingFinal, setPendingFinal] = useState([]);
 </Card>
 
 {/* Supervisor Financial Summary */}
-<Card sx={{ mt: 3, borderRadius: 3, p: { xs: 2, sm: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+<Card sx={{ mt: 3, borderRadius: 3, p: { xs: 1, sm: 2, md: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
   <Typography variant="h6" fontWeight="bold" mb={2}>👨‍💼 Supervisor Summary</Typography>
   <Grid container spacing={2}>
     <Grid item xs={6} sm={3}><Typography variant="body2">Total Supervisors</Typography><Typography variant="h6">{fullSummary.supervisorSummary?.total_supervisors || 0}</Typography></Grid>
@@ -468,7 +470,7 @@ const [pendingFinal, setPendingFinal] = useState([]);
 
 {/* Top 10 Dues Labour Slider */}
 {/* Top 10 Dues Labour Auto Slider */}
-<Card sx={{ mt: 3, borderRadius: 3, p: { xs: 2, sm: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+<Card sx={{ mt: 3, borderRadius: 3, p: { xs: 1, sm: 2, md: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
   <Typography variant="h6" fontWeight="bold" mb={2}>🔝 Top 10 Dues Labour</Typography>
   <Box className="slider-container">
     <Box className="slider-track">
@@ -502,7 +504,7 @@ const [pendingFinal, setPendingFinal] = useState([]);
 </Card>
 
 {/* Combined Profit Summary */}
-<Card sx={{ mt: 3, borderRadius: 3, p: { xs: 2, sm: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+<Card sx={{ mt: 3, borderRadius: 3, p: { xs: 1, sm: 2, md: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
   <Typography variant="h6" fontWeight="bold" mb={2}>💰 Profit Summary (This Month)</Typography>
   <Grid container spacing={2}>
     <Grid item xs={6} sm={3}><Typography variant="body2">Company Bill</Typography><Typography variant="h6">₹{Number(fullSummary.profitSummary?.company_bill || 0).toLocaleString()}</Typography></Grid>
@@ -514,7 +516,7 @@ const [pendingFinal, setPendingFinal] = useState([]);
 
 {/* Pending Finalization Alerts */}
 {pendingFinal.length > 0 && (
-  <Card sx={{ mt: 3, borderRadius: 3, p: { xs: 2, sm: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)', bgcolor: '#fff3e0' }}>
+  <Card sx={{ mt: 3, borderRadius: 3, p: { xs: 1, sm: 2, md: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)', bgcolor: '#fff3e0' }}>
     <Typography variant="h6" fontWeight="bold" mb={2} color="warning.main">
       ⚠️ Pending Finalization
     </Typography>

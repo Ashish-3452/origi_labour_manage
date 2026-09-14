@@ -88,7 +88,7 @@ const ThekaWork = () => {
       <Grid container spacing={3}>
         {/* Form */}
         <Grid item xs={12} md={5}>
-          <Paper sx={{ p: 3, borderRadius: 3 }}>
+          <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
             <Typography variant="h6" mb={2}>📝 Work Details</Typography>
 
             <TextField fullWidth label="Description" sx={{ mb: 2 }}
@@ -183,7 +183,7 @@ const ThekaWork = () => {
           )}
 
           {/* History */}
-          <Paper sx={{ p: 3, borderRadius: 3 }}>
+          <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
             <Typography variant="h6" mb={2}>📋 Theka History</Typography>
             <TableContainer sx={{ overflowX: 'auto' }}>
               <Table size="small">

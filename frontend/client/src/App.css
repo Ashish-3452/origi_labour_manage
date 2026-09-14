@@ -182,3 +182,118 @@ body {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* ========================================
+   MOBILE POLISH - ENHANCED
+   ======================================== */
+
+/* Prevent body scroll when drawer open */
+body.drawer-open {
+  overflow: hidden;
+}
+
+/* Mobile Table Improvements */
+@media (max-width: 768px) {
+  /* Tables scroll horizontally */
+  .MuiTableContainer-root {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Compact table cells */
+  .MuiTableCell-root {
+    white-space: nowrap;
+    padding: 8px 6px !important;
+    font-size: 0.75rem !important;
+  }
+  
+  /* Sticky first column for tables */
+  .MuiTableCell-root:first-child {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 2;
+  }
+  
+  /* Dialog full screen on mobile */
+  .MuiDialog-paper {
+    margin: 0 !important;
+    max-height: 100vh !important;
+    height: 100vh !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+  }
+  
+  /* Form inputs full width */
+  .MuiTextField-root {
+    width: 100% !important;
+  }
+  
+  /* Buttons in dialogs side by side */
+  .MuiDialogActions-root {
+    padding: 12px !important;
+  }
+  .MuiDialogActions-root .MuiButton-root {
+    flex: 1;
+  }
+  
+  /* Cards stack */
+  .MuiGrid-container {
+    margin: 0 !important;
+  }
+  
+  /* Paper padding */
+  .MuiPaper-root {
+    padding: 12px !important;
+  }
+  
+  /* Sidebar drawer width */
+  .MuiDrawer-paper {
+    width: 85vw !important;
+    max-width: 320px;
+  }
+  
+  /* Chips smaller */
+  .MuiChip-root {
+    height: 22px !important;
+    font-size: 0.7rem !important;
+  }
+  
+  /* Icons in buttons */
+  .MuiButton-startIcon {
+    margin-right: 4px !important;
+  }
+}
+
+/* Very small screens (iPhone SE, etc) */
+@media (max-width: 375px) {
+  .MuiTableCell-root {
+    padding: 6px 4px !important;
+    font-size: 0.7rem !important;
+  }
+  
+  h5 {
+    font-size: 1.1rem !important;
+  }
+  
+  h6 {
+    font-size: 1rem !important;
+  }
+}
+
+/* Touch-friendly tap targets */
+@media (hover: none) and (pointer: coarse) {
+  .MuiIconButton-root {
+    padding: 10px !important;
+  }
+  
+  .MuiListItem-root {
+    min-height: 48px !important;
+  }
+}
+
+/* Landscape mode adjustments */
+@media (max-width: 900px) and (orientation: landscape) {
+  .MuiDrawer-paper {
+    width: 240px !important;
+  }
+}

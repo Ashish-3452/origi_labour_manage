@@ -42,7 +42,7 @@ const ProfitDashboard = () => {
   if (!summary) return <Typography p={3}>Loading...</Typography>;
 
   return (
-    <Box sx={{ p: 3, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
+    <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography variant="h5" fontWeight="bold">📊 Advanced Profit & Loss</Typography>
         <TextField type="month" size="small" value={month}
@@ -78,7 +78,7 @@ const ProfitDashboard = () => {
 
       {/* TAB 0: Daily Trend */}
       {tab === 0 && (
-        <Paper sx={{ p: 3, borderRadius: 3 }}>
+        <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
           <Typography variant="h6" mb={2}>Daily Profit Trend</Typography>
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={dailyTrend}>
@@ -99,7 +99,7 @@ const ProfitDashboard = () => {
       {tab === 1 && (
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3, borderRadius: 3 }}>
+            <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
               <Typography variant="h6" mb={2}>Site-wise Profit</Typography>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={siteWise}>
@@ -114,7 +114,7 @@ const ProfitDashboard = () => {
             </Paper>
           </Grid>
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3, borderRadius: 3 }}>
+            <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
               <Typography variant="h6" mb={2}>Site Details</Typography>
               <TableContainer sx={{ overflowX: 'auto' }}>
                 <Table size="small">
@@ -143,7 +143,7 @@ const ProfitDashboard = () => {
       {tab === 2 && (
         <Grid container spacing={3}>
           <Grid item xs={12} md={5}>
-            <Paper sx={{ p: 3, borderRadius: 3 }}>
+            <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
               <Typography variant="h6" mb={2}>Category Distribution</Typography>
               <ResponsiveContainer width="100%" height={350}>
                 <PieChart>
@@ -159,7 +159,7 @@ const ProfitDashboard = () => {
             </Paper>
           </Grid>
           <Grid item xs={12} md={7}>
-            <Paper sx={{ p: 3, borderRadius: 3 }}>
+            <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
               <Typography variant="h6" mb={2}>Category Details</Typography>
               <TableContainer>
                 <Table size="small">
@@ -185,7 +185,7 @@ const ProfitDashboard = () => {
 
       {/* TAB 3: Ghost Hajri */}
       {tab === 3 && (
-        <Paper sx={{ p: 3, borderRadius: 3 }}>
+        <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
           <Typography variant="h6" mb={2}>👻 Ghost Hajri Tracking</Typography>
           <TableContainer>
             <Table>

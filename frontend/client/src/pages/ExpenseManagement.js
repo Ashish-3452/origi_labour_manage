@@ -56,7 +56,7 @@ const ExpenseManagement = () => {
   const totalExpenses = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
   return (
-    <Box sx={{ p: 3, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
+    <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
       <Typography variant="h5" fontWeight="bold" mb={3}>💸 Expense Management</Typography>
 
       {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
@@ -93,7 +93,7 @@ const ExpenseManagement = () => {
       <Grid container spacing={3}>
         {/* Add Expense Form */}
         <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, borderRadius: 3 }}>
+          <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
             <Typography variant="h6" mb={2}><Add sx={{ mr: 1 }} />Add Expense</Typography>
             <form onSubmit={handleSubmit}>
               <TextField fullWidth select label="Category" sx={{ mb: 2 }} required
@@ -121,7 +121,7 @@ const ExpenseManagement = () => {
 
         {/* Expenses List */}
         <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, borderRadius: 3 }}>
+          <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
               <Typography variant="h6">📋 Expense List</Typography>
               <TextField type="month" size="small" value={month}

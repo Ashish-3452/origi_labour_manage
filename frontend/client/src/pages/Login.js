@@ -49,7 +49,13 @@ const Login = () => {
       background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #01579b 100%)',
       padding: 2
     }}>
-      <Card sx={{ maxWidth: 420, width: '90%', borderRadius: 4, boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+      <Card sx={{ 
+  maxWidth: 420, 
+  width: { xs: '92%', sm: '90%' }, 
+  borderRadius: 4, 
+  boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+  p: { xs: 1, sm: 0 }
+}}>
         <CardContent sx={{ padding: 4 }}>
           <Box sx={{ textAlign: 'center', mb: 4 }}>
             <Box sx={{

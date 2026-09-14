@@ -85,7 +85,7 @@ const LabourSiteRates = () => {
 
   return (
     <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
-      <Paper sx={{ maxWidth: 900, mx: 'auto', p: { xs: 2, sm: 3 }, borderRadius: 3 }}>
+      <Paper sx={{ maxWidth: 900, mx: 'auto', p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
         <Typography variant="h5" fontWeight="bold" mb={3}>
           <Business sx={{ mr: 1, verticalAlign: 'middle' }} />
           Site-wise Category Rates

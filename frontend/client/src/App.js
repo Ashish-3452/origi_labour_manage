@@ -22,6 +22,7 @@ import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 import LabourSiteRates from './pages/LabourSiteRates';
 import AttendanceReport from './pages/AttendanceReport';
+import AdvanceHistory from './pages/AdvanceHistory';
 import './App.css';
 
 
@@ -176,6 +177,12 @@ function App() {
 <Route path="/attendance/report" element={
   <ProtectedRoute>
     <AttendanceReport />
+  </ProtectedRoute>
+} />
+
+<Route path="/payments/history" element={
+  <ProtectedRoute>
+    <AdvanceHistory />
   </ProtectedRoute>
 } />
 

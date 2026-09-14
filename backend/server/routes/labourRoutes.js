@@ -174,4 +174,15 @@ router.get('/site-category-rates/:siteId', authenticate, authorize('SUPER_ADMIN'
   }
 });
 
+// Update Labour Details
+router.put('/update/:id', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+  try {
+    const Labour = require('../models/Labour');
+    await Labour.update(req.params.id, req.body);
+    res.json({ success: true, message: 'Labour updated successfully!' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;

@@ -32,7 +32,7 @@ const BillGeneration = () => {
 };
 
   return (
-    <Box sx={{ p: 3, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
+    <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
       <Paper sx={{ maxWidth: 800, mx: 'auto', p: 4, borderRadius: 3 }}>
         <Typography variant="h5" fontWeight="bold" mb={3}>
           <PictureAsPdf sx={{ mr: 1, verticalAlign: 'middle' }} />

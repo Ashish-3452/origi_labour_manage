@@ -49,12 +49,19 @@ export const labourAPI = {
     getInactive: () => api.get('/labour/inactive'),
   getActiveCount: () => api.get('/labour/active-count'),
   toggleStatus: (id, status) => api.put(`/labour/toggle-status/${id}`, { is_active: status }),
+  update: (id, data) => api.put(`/labour/update/${id}`, data),
 };
 
 // Site Rate APIs
 export const siteRateAPI = {
   getByLabour: (labourId) => api.get(`/labour/site-rates/${labourId}`),
   save: (data) => api.post('/labour/site-rate', data),
+};
+
+// Payment APIs
+export const paymentAPI = {
+  getAllHistory: () => api.get('/payments/all-history'),
+  getLabourHistory: (labourId) => api.get(`/payments/history/${labourId}`),
 };
 
 export default api;

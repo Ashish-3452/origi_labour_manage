@@ -172,13 +172,13 @@ const handleQuickStatus = async (att, newStatus) => {
 
   return (
     <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
-      <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3 }}>
+      <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
         <Typography variant="h5" fontWeight="bold" mb={3}>📋 Attendance Management</Typography>
 
         {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
         {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
 
-        <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid container spacing={{ xs: 1, sm: 2 }} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={3}>
             <TextField fullWidth select label="Select Site" value={selectedSite}
               onChange={(e) => setSelectedSite(e.target.value)}>

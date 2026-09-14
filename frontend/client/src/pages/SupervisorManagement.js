@@ -74,8 +74,8 @@ const SupervisorManagement = () => {
   return salary + khoraki + mobile + travel + accommodation;
 };
   return (
-    <Box sx={{ p: 3, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
-      <Paper sx={{ p: 3, borderRadius: 3 }}>
+    <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
+      <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
           <Typography variant="h5" fontWeight="bold">👨‍💼 Supervisor Management</Typography>
           <Box>

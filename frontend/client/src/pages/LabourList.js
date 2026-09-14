@@ -6,9 +6,9 @@ import {
   Box, Paper, Typography, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Button, TextField,
   MenuItem, Grid, Chip, IconButton, Dialog, DialogContent,
-  DialogTitle, CircularProgress, Tabs, Tab
+  DialogTitle, CircularProgress, Tabs, Tab,DialogActions
 } from '@mui/material';
-import { Add, Search, Visibility, Close,FileDownload,PictureAsPdf } from '@mui/icons-material';
+import { Add, Search, Visibility, Close,FileDownload,PictureAsPdf,Edit } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { labourAPI, categoryAPI, siteAPI } from '../services/api';
 
@@ -20,6 +20,11 @@ const LabourList = () => {
   const [filters, setFilters] = useState({ search: '', category_id: '', site_id: '' });
   const [selectedLabour, setSelectedLabour] = useState(null);
   const [openDetails, setOpenDetails] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+const [editForm, setEditForm] = useState({
+  name: '', mobile: '', aadhar_no: '', address: '',
+  category_id: '', site_id: '', emergency_contact: ''
+});
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState(0);
   const [inactiveLabour, setInactiveLabour] = useState([]);
@@ -95,6 +100,31 @@ const LabourList = () => {
     setSelectedLabour(lab);
     setOpenDetails(true);
   };
+
+  const handleEditOpen = (lab) => {
+  setSelectedLabour(lab);
+  setEditForm({
+    name: lab.name || '',
+    mobile: lab.mobile || '',
+    aadhar_no: lab.aadhar_no || '',
+    address: lab.address || '',
+    category_id: lab.category_id || '',
+    site_id: lab.site_id || '',
+    emergency_contact: lab.emergency_contact || ''
+  });
+  setOpenEdit(true);
+};
+
+const handleEditSave = async () => {
+  try {
+    await labourAPI.update(selectedLabour.id, editForm);
+    setSuccess('Labour updated!');
+    setOpenEdit(false);
+    loadData();
+  } catch (err) {
+    setError(err.response?.data?.error || 'Update failed');
+  }
+};
 
   const handleToggleStatus = async (id, status) => {
   if (!window.confirm(status ? 'Labour ko active kare?' : 'Labour ko left mark kare?')) return;
@@ -186,17 +216,18 @@ const handleExportPDF = () => {
 
   return (
     <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
-      <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3 }}>
+      <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 1 }}>
   <Typography variant="h5" fontWeight="bold">👥 Labour List</Typography>
   
-<Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+<Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', width: { xs: '100%', sm: 'auto' } }}>
   <Button
     variant="contained"
     color="success"
     startIcon={<FileDownload />}
     onClick={handleExportExcel}
     disabled={labour.length === 0}
+    sx={{ flex: { xs: '1 1 calc(50% - 4px)', sm: 'none' }, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
   >
     Excel
   </Button>
@@ -206,10 +237,16 @@ const handleExportPDF = () => {
     startIcon={<PictureAsPdf />}
     onClick={handleExportPDF}
     disabled={labour.length === 0}
+    sx={{ flex: { xs: '1 1 calc(50% - 4px)', sm: 'none' }, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
   >
     PDF
   </Button>
-  <Button variant="contained" startIcon={<Add />} onClick={() => navigate('/labour/register')}>
+  <Button 
+    variant="contained" 
+    startIcon={<Add />} 
+    onClick={() => navigate('/labour/register')}
+    sx={{ flex: { xs: '1 1 100%', sm: 'none' }, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+  >
     Add Labour
   </Button>
 </Box>
@@ -307,6 +344,9 @@ const handleExportPDF = () => {
   <IconButton size="small" color="primary" onClick={() => handleViewDetails(lab)}>
     <Visibility />
   </IconButton>
+  <IconButton size="small" color="warning" onClick={() => handleEditOpen(lab)} title="Edit">
+    <Edit />
+  </IconButton>
   <IconButton size="small" color="error" onClick={() => handleToggleStatus(lab.id, false)} title="Mark as Left">
     <Close />
   </IconButton>
@@ -385,8 +425,79 @@ const handleExportPDF = () => {
           )}
         </DialogContent>
       </Dialog>
-    </Box>
-  );
+
+{/* Edit Dialog */}
+<Dialog open={openEdit} onClose={() => setOpenEdit(false)} maxWidth="sm" fullWidth>
+  <DialogTitle>
+    Edit Labour Details
+    <IconButton onClick={() => setOpenEdit(false)} sx={{ float: 'right' }}>
+      <Close />
+    </IconButton>
+  </DialogTitle>
+  <DialogContent dividers>
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth label="Name" value={editForm.name}
+          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth label="Mobile" value={editForm.mobile}
+          onChange={(e) => setEditForm({ ...editForm, mobile: e.target.value })}
+          inputProps={{ maxLength: 10 }}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth label="Aadhar" value={editForm.aadhar_no}
+          onChange={(e) => setEditForm({ ...editForm, aadhar_no: e.target.value })}
+          inputProps={{ maxLength: 12 }}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth label="Emergency Contact" value={editForm.emergency_contact}
+          onChange={(e) => setEditForm({ ...editForm, emergency_contact: e.target.value })}
+          inputProps={{ maxLength: 10 }}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth select label="Category" value={editForm.category_id}
+          onChange={(e) => setEditForm({ ...editForm, category_id: e.target.value })}
+        >
+          {categories.map(c => (
+            <MenuItem key={c.id} value={c.id}>{c.category_name}</MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth select label="Site" value={editForm.site_id}
+          onChange={(e) => setEditForm({ ...editForm, site_id: e.target.value })}
+        >
+          {sites.map(s => (
+            <MenuItem key={s.id} value={s.id}>{s.site_name}</MenuItem>
+          ))}
+        </TextField>
+      </Grid>
+      <Grid item xs={12}>
+        <TextField
+          fullWidth label="Address" multiline rows={2} value={editForm.address}
+          onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+        />
+      </Grid>
+    </Grid>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setOpenEdit(false)}>Cancel</Button>
+    <Button variant="contained" onClick={handleEditSave}>Save Changes</Button>
+  </DialogActions>
+</Dialog>
+</Box>
+);
 };
 
 export default LabourList;

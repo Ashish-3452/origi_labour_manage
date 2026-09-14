@@ -133,6 +133,22 @@ static async getInactiveLabour() {
   return rows;
 }
 
+// Update labour details
+static async update(id, labourData) {
+  const { name, mobile, aadhar_no, address, category_id, site_id, emergency_contact, bank_account, ifsc_code } = labourData;
+
+  await pool.query(
+    `UPDATE labour SET 
+      name = ?, mobile = ?, aadhar_no = ?, address = ?,
+      category_id = ?, site_id = ?, emergency_contact = ?,
+      bank_account = ?, ifsc_code = ?
+     WHERE id = ?`,
+    [name, mobile, aadhar_no, address, category_id, site_id,
+     emergency_contact, bank_account, ifsc_code, id]
+  );
+  return true;
+}
+
 // Get total count of active labour
 static async getActiveCount() {
   const [rows] = await pool.query(

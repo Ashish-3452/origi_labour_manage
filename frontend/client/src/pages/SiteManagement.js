@@ -82,7 +82,7 @@ const SiteManagement = () => {
 
   return (
     <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
-      <Paper sx={{ maxWidth: 900, mx: 'auto', p: { xs: 2, sm: 3 }, borderRadius: 3 }}>
+      <Paper sx={{ maxWidth: 900, mx: 'auto', p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
         
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3, flexWrap: 'wrap', gap: 1 }}>
           <Typography variant="h5" fontWeight="bold">

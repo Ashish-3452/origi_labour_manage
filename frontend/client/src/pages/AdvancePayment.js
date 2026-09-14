@@ -62,8 +62,8 @@ const AdvancePayment = () => {
   };
 
   return (
-    <Box sx={{ p: 3, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
-      <Paper sx={{ maxWidth: 600, mx: 'auto', p: 3, borderRadius: 3 }}>
+    <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
+      <Paper sx={{ maxWidth: 600, mx: 'auto', p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
         
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Payment sx={{ fontSize: 30, color: '#1976d2', mr: 1 }} />
