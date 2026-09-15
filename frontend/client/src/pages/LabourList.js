@@ -6,7 +6,7 @@ import {
   Box, Paper, Typography, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Button, TextField,
   MenuItem, Grid, Chip, IconButton, Dialog, DialogContent,
-  DialogTitle, CircularProgress, Tabs, Tab,DialogActions
+  DialogTitle, CircularProgress, Tabs, Tab,DialogActions,Alert
 } from '@mui/material';
 import { Add, Search, Visibility, Close,FileDownload,PictureAsPdf,Edit } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -26,6 +26,8 @@ const [editForm, setEditForm] = useState({
   category_id: '', site_id: '', emergency_contact: ''
 });
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
+const [error, setError] = useState('');
   const [tab, setTab] = useState(0);
   const [inactiveLabour, setInactiveLabour] = useState([]);
   const [totalActive, setTotalActive] = useState(0);
@@ -217,8 +219,11 @@ const handleExportPDF = () => {
   return (
     <Box sx={{ p: { xs: 1, sm: 2, md: 3 }, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
       <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, borderRadius: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 1 }}>
-  <Typography variant="h5" fontWeight="bold">👥 Labour List</Typography>
+        {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
+  {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
+  
+  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 1 }}>
+    <Typography variant="h5" fontWeight="bold">👥 Labour List</Typography>
   
 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', width: { xs: '100%', sm: 'auto' } }}>
   <Button
