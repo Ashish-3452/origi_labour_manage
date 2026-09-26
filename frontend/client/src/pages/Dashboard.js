@@ -32,6 +32,8 @@ const Dashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [notifications, setNotifications] = useState([]);
 const [notifAnchor, setNotifAnchor] = useState(null);
+const [duesIndex, setDuesIndex] = useState(0);
+const [duesNoTransition, setDuesNoTransition] = useState(false);
 
 const handleRefresh = async () => {
   setRefreshing(true);
@@ -71,6 +73,30 @@ const [pendingFinal, setPendingFinal] = useState([]);
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, [navigate]);
+
+  // Auto slide Top Dues
+useEffect(() => {
+  const topDues = fullSummary.topDuesLabour || [];
+  if (topDues.length <= 1) return;
+
+  const interval = setInterval(() => {
+    setDuesIndex(prev => prev + 1);
+  }, 3000);
+
+  return () => clearInterval(interval);
+}, [fullSummary.topDuesLabour]);
+
+// Seamless loop reset
+useEffect(() => {
+  const topDues = fullSummary.topDuesLabour || [];
+  if (duesIndex >= topDues.length && topDues.length > 0) {
+    setTimeout(() => {
+      setDuesNoTransition(true);
+      setDuesIndex(0);
+      setTimeout(() => setDuesNoTransition(false), 50);
+    }, 650);
+  }
+}, [duesIndex, fullSummary.topDuesLabour]);
 
   const loadDashboardStats = async () => {
   try {
@@ -470,6 +496,7 @@ const [pendingFinal, setPendingFinal] = useState([]);
 
 {/* Top 10 Dues Labour Slider */}
 {/* Top 10 Dues Labour Auto Slider */}
+{/* Top 10 Dues Labour Step Slider */}
 <Card sx={{ mt: 3, borderRadius: 3, p: { xs: 2, sm: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
     <Typography variant="h6" fontWeight="bold">🔝 Top 10 Dues Labour</Typography>
@@ -479,69 +506,66 @@ const [pendingFinal, setPendingFinal] = useState([]);
   </Box>
 
   {fullSummary.topDuesLabour?.length > 0 ? (
-    <Box className="slider-wrapper">
-      <Box className="slider-track">
-        {/* Original list */}
-        {fullSummary.topDuesLabour.map((lab, i) => (
-          <Card 
-            key={`a-${lab.id}`} 
-            className="slider-card"
-            sx={{ 
-              bgcolor: '#fff3e0', 
-              borderLeft: '4px solid #f44336',
-            }}
-          >
-            <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                <Typography variant="caption" sx={{ bgcolor: '#f44336', color: 'white', px: 1, py: 0.3, borderRadius: 1, fontWeight: 'bold' }}>
-                  #{i + 1}
+    <Box className="dues-slider-container">
+      <Box
+        className="dues-slider-track"
+        sx={{
+          transform: `translateX(-${duesIndex * 100}%)`,
+          transition: duesNoTransition ? 'none' : 'transform 0.6s ease-in-out'
+        }}
+      >
+        {[...fullSummary.topDuesLabour, ...fullSummary.topDuesLabour].map((lab, i) => (
+          <Box key={`${lab.id}-${i}`} className="dues-slide-item">
+            <Card
+              sx={{
+                bgcolor: '#fff3e0',
+                borderLeft: '4px solid #f44336',
+                borderRadius: 2,
+                height: '100%'
+              }}
+            >
+              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      bgcolor: '#f44336',
+                      color: 'white',
+                      px: 1,
+                      py: 0.3,
+                      borderRadius: 1,
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    #{((i % fullSummary.topDuesLabour.length) + 1)}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {lab.labour_code}
+                  </Typography>
+                </Box>
+                <Typography variant="subtitle1" fontWeight="bold" noWrap>
+                  {lab.name}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {lab.labour_code}
+                <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block', mb: 1 }}>
+                  {lab.category_name}
                 </Typography>
-              </Box>
-              <Typography variant="subtitle2" fontWeight="bold" noWrap>
-                {lab.name}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
-                {lab.category_name}
-              </Typography>
-              <Typography variant="h6" color="error" fontWeight="bold" sx={{ mt: 1 }}>
-                ₹{Number(lab.balance_due).toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
+                <Typography variant="h6" color="error" fontWeight="bold">
+                  ₹{Number(lab.balance_due).toLocaleString()}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Box>
         ))}
-        {/* Duplicate for seamless loop */}
-        {fullSummary.topDuesLabour.map((lab, i) => (
-          <Card 
-            key={`b-${lab.id}`} 
-            className="slider-card"
-            sx={{ 
-              bgcolor: '#fff3e0', 
-              borderLeft: '4px solid #f44336',
-            }}
-          >
-            <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                <Typography variant="caption" sx={{ bgcolor: '#f44336', color: 'white', px: 1, py: 0.3, borderRadius: 1, fontWeight: 'bold' }}>
-                  #{i + 1}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {lab.labour_code}
-                </Typography>
-              </Box>
-              <Typography variant="subtitle2" fontWeight="bold" noWrap>
-                {lab.name}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
-                {lab.category_name}
-              </Typography>
-              <Typography variant="h6" color="error" fontWeight="bold" sx={{ mt: 1 }}>
-                ₹{Number(lab.balance_due).toLocaleString()}
-              </Typography>
-            </CardContent>
-          </Card>
+      </Box>
+
+      {/* Dots indicator */}
+      <Box className="dues-dots">
+        {fullSummary.topDuesLabour.map((_, i) => (
+          <Box
+            key={i}
+            className={`dues-dot ${i === (duesIndex % fullSummary.topDuesLabour.length) ? 'active' : ''}`}
+            onClick={() => setDuesIndex(i)}
+          />
         ))}
       </Box>
     </Box>
