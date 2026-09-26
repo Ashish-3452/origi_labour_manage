@@ -297,3 +297,74 @@ body.drawer-open {
     width: 240px !important;
   }
 }
+
+
+/* ========================================
+   PREVENT HORIZONTAL SCROLL ON MOBILE
+   ======================================== */
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+#root {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  /* Force prevent horizontal scroll */
+  body {
+    position: relative;
+    overflow-x: hidden !important;
+  }
+  
+  /* All containers respect viewport */
+  .MuiContainer-root,
+  .MuiBox-root,
+  .MuiPaper-root,
+  .MuiGrid-root {
+    max-width: 100vw !important;
+    overflow-x: hidden;
+  }
+  
+  /* Tables can scroll horizontally WITHIN their container */
+  .MuiTableContainer-root {
+    overflow-x: auto !important;
+    max-width: 100% !important;
+  }
+  
+  /* Prevent text overflow */
+  .MuiTypography-root {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Prevent images from overflowing */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Prevent long numbers/text from stretching */
+  .MuiTableCell-root {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Menu/Dialog respect viewport */
+  .MuiMenu-paper,
+  .MuiDialog-paper {
+    max-width: 95vw !important;
+  }
+  
+  /* Chips don't overflow */
+  .MuiChip-root {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
