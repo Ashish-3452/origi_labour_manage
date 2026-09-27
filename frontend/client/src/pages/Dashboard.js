@@ -18,50 +18,34 @@ const drawerWidth = 280;
 
 const Dashboard = () => {
   const navigate = useNavigate();
+
+  // ============ 1. SAARI STATE DECLARATIONS (ek jagah) ============
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [stats, setStats] = useState({
     total_labour: 0,
     present_today: 0,
+    absent_today: 0,
     today_profit: 0,
     total_outstanding: 0,
     today_hajri: 0
   });
-
   const [refreshing, setRefreshing] = useState(false);
   const [notifications, setNotifications] = useState([]);
-const [notifAnchor, setNotifAnchor] = useState(null);
-const [duesIndex, setDuesIndex] = useState(0);
-const [duesNoTransition, setDuesNoTransition] = useState(false);
-
-const handleRefresh = async () => {
-  setRefreshing(true);
-  await loadDashboardStats();
-  setRefreshing(false);
-};
-
-const loadNotifications = async () => {
-  try {
-    const res = await api.get('/dashboard/notifications');
-    if (res.data.success) setNotifications(res.data.data);
-  } catch (err) {
-    console.error('Notifications load error:', err);
-  }
-};
-
-const handleNotifOpen = (e) => {
-  setNotifAnchor(e.currentTarget);
-  loadNotifications();
-};
-
-const handleNotifClose = () => {
-  setNotifAnchor(null);
-};
-
+  const [notifAnchor, setNotifAnchor] = useState(null);
+  const [duesIndex, setDuesIndex] = useState(0);
+  const [duesNoTransition, setDuesNoTransition] = useState(false);
   const [siteWise, setSiteWise] = useState([]);
-const [pendingFinal, setPendingFinal] = useState([]);
+  const [pendingFinal, setPendingFinal] = useState([]);
+  const [fullSummary, setFullSummary] = useState({
+    topDuesLabour: [],
+    supervisorSummary: {},
+    profitSummary: {},
+    totalOutstanding: 0
+  });
 
+  // ============ 2. SAARE useEffect HOOKS ============
   useEffect(() => {
     const userData = localStorage.getItem('user');
     if (!userData) {
@@ -75,59 +59,79 @@ const [pendingFinal, setPendingFinal] = useState([]);
   }, [navigate]);
 
   // Auto slide Top Dues
-useEffect(() => {
-  const topDues = fullSummary.topDuesLabour || [];
-  if (topDues.length <= 1) return;
+  useEffect(() => {
+    const topDues = fullSummary.topDuesLabour || [];
+    if (topDues.length <= 1) return;
 
-  const interval = setInterval(() => {
-    setDuesIndex(prev => prev + 1);
-  }, 3000);
+    const interval = setInterval(() => {
+      setDuesIndex(prev => prev + 1);
+    }, 3000);
 
-  return () => clearInterval(interval);
-}, [fullSummary.topDuesLabour]);
+    return () => clearInterval(interval);
+  }, [fullSummary.topDuesLabour]);
 
-// Seamless loop reset
-useEffect(() => {
-  const topDues = fullSummary.topDuesLabour || [];
-  if (duesIndex >= topDues.length && topDues.length > 0) {
-    setTimeout(() => {
-      setDuesNoTransition(true);
-      setDuesIndex(0);
-      setTimeout(() => setDuesNoTransition(false), 50);
-    }, 650);
-  }
-}, [duesIndex, fullSummary.topDuesLabour]);
+  // Seamless loop reset
+  useEffect(() => {
+    const topDues = fullSummary.topDuesLabour || [];
+    if (duesIndex >= topDues.length && topDues.length > 0) {
+      setTimeout(() => {
+        setDuesNoTransition(true);
+        setDuesIndex(0);
+        setTimeout(() => setDuesNoTransition(false), 50);
+      }, 650);
+    }
+  }, [duesIndex, fullSummary.topDuesLabour]);
 
+  // ============ 3. SAARE FUNCTIONS ============
   const loadDashboardStats = async () => {
-  try {
-    const [statsRes, siteRes, pendingRes, fullRes, notifRes] = await Promise.all([
-      api.get('/dashboard/stats'),
-      api.get('/dashboard/site-wise'),
-      api.get('/dashboard/pending-finalization'),
-      api.get('/dashboard/full-summary'),
-      api.get('/dashboard/notifications')
-    ]);
-    if (statsRes.data.success) setStats(statsRes.data.data);
-    if (siteRes.data.success) setSiteWise(siteRes.data.data);
-    if (pendingRes.data.success) setPendingFinal(pendingRes.data.data);
-    if (fullRes.data.success) setFullSummary(fullRes.data.data);
-    if (notifRes.data.success) setNotifications(notifRes.data.data);
-  } catch (err) {
-    console.error('Stats load error:', err);
-  }
-};
+    try {
+      const [statsRes, siteRes, pendingRes, fullRes, notifRes] = await Promise.all([
+        api.get('/dashboard/stats'),
+        api.get('/dashboard/site-wise'),
+        api.get('/dashboard/pending-finalization'),
+        api.get('/dashboard/full-summary'),
+        api.get('/dashboard/notifications')
+      ]);
+      if (statsRes.data.success) setStats(statsRes.data.data);
+      if (siteRes.data.success) setSiteWise(siteRes.data.data);
+      if (pendingRes.data.success) setPendingFinal(pendingRes.data.data);
+      if (fullRes.data.success) setFullSummary(fullRes.data.data);
+      if (notifRes.data.success) setNotifications(notifRes.data.data);
+    } catch (err) {
+      console.error('Stats load error:', err);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadDashboardStats();
+    setRefreshing(false);
+  };
+
+  const loadNotifications = async () => {
+    try {
+      const res = await api.get('/dashboard/notifications');
+      if (res.data.success) setNotifications(res.data.data);
+    } catch (err) {
+      console.error('Notifications load error:', err);
+    }
+  };
+
+  const handleNotifOpen = (e) => {
+    setNotifAnchor(e.currentTarget);
+    loadNotifications();
+  };
+
+  const handleNotifClose = () => {
+    setNotifAnchor(null);
+  };
 
   const handleLogout = () => {
     localStorage.clear();
     navigate('/');
   };
 
-  const [fullSummary, setFullSummary] = useState({
-  topDuesLabour: [],
-  supervisorSummary: {},
-  profitSummary: {},
-  totalOutstanding: 0
-});
+  
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
