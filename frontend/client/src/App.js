@@ -25,6 +25,7 @@ import AttendanceReport from './pages/AttendanceReport';
 import AdvanceHistory from './pages/AdvanceHistory';
 import FoodAdvance from './pages/FoodAdvance';
 import BillManagement from './pages/BillManagement';
+import BillSummary from './pages/BillSummary';
 import './App.css';
 
 
