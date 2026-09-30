@@ -200,6 +200,13 @@ function App() {
   </ProtectedRoute>
 } />
 
+import BillSummary from './pages/BillSummary';
+
+<Route path="/bill-summary" element={
+  <ProtectedRoute>
+    <BillSummary />
+  </ProtectedRoute>
+} />
 
           {/* Catch-all - should be last */}
           <Route path="*" element={<Navigate to="/" replace />} />

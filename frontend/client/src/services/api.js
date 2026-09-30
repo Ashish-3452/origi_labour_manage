@@ -83,6 +83,8 @@ export const billAPI = {
     api.get('/bills/calculate-deduction', { params: { site_id, period_start, period_end } }),
   addPayment: (id, data) => api.post(`/bills/${id}/payment`, data),
   delete: (id) => api.delete(`/bills/${id}`),
+  getSiteSummary: (month) => api.get('/bills/summary/site-wise', { params: { month } }),
+getAgingReport: () => api.get('/bills/summary/aging'),
 };
 
 export default api;

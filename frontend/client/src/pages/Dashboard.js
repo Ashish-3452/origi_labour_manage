@@ -135,6 +135,7 @@ const Dashboard = () => {
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+    
     { text: 'Labour List', icon: <People />, path: '/labour/list' },
     { text: 'Add Labour', icon: <PersonAdd />, path: '/labour/register' },
     { text: 'Attendance', icon: <Assignment />, path: '/attendance/mark' },
@@ -153,6 +154,7 @@ const Dashboard = () => {
     { text: 'Advance History', icon: <History />, path: '/payments/history' },
     { text: 'Food Advance', icon: <Restaurant />, path: '/food-advance' },
     { text: 'Bill Management', icon: <Receipt />, path: '/bill-management' },
+{ text: 'Bill Summary', icon: <Assessment />, path: '/bill-summary' },
     { text: 'Activity Log', icon: <History />, path: '/activity' },
     { text: 'Settings', icon: <Settings />, path: '/settings' },
   ];

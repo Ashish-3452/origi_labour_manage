@@ -229,4 +229,98 @@ router.delete('/:id', authenticate, authorize('SUPER_ADMIN'), async (req, res) =
   }
 });
 
+// Site-wise Bill Summary
+router.get('/summary/site-wise', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+  try {
+    const { month } = req.query;
+    
+    let whereClause = '';
+    const params = [];
+    if (month) {
+      whereClause = ' AND DATE_FORMAT(b.bill_date, "%Y-%m") = ?';
+      params.push(month);
+    }
+
+    const [rows] = await pool.query(`
+      SELECT 
+        s.id, s.site_name,
+        COUNT(b.id) as total_bills,
+        COALESCE(SUM(b.bill_amount), 0) as total_bill_amount,
+        COALESCE(SUM(b.food_advance_deducted), 0) as total_food_deducted,
+        COALESCE(SUM(b.other_deductions), 0) as total_other_deductions,
+        COALESCE(SUM(b.net_payable), 0) as total_net_payable,
+        COALESCE(SUM(b.amount_received), 0) as total_received,
+        COALESCE(SUM(b.balance), 0) as total_balance,
+        SUM(CASE WHEN b.status = 'PENDING' THEN 1 ELSE 0 END) as pending_count,
+        SUM(CASE WHEN b.status = 'PARTIAL' THEN 1 ELSE 0 END) as partial_count,
+        SUM(CASE WHEN b.status = 'PAID' THEN 1 ELSE 0 END) as paid_count
+      FROM sites s
+      LEFT JOIN bills b ON s.id = b.site_id ${whereClause}
+      WHERE s.is_active = TRUE
+      GROUP BY s.id, s.site_name
+      ORDER BY total_balance DESC
+    `, params);
+
+    // Grand totals
+    const totals = rows.reduce((acc, r) => ({
+      total_bills: acc.total_bills + Number(r.total_bills),
+      total_bill_amount: acc.total_bill_amount + Number(r.total_bill_amount),
+      total_food_deducted: acc.total_food_deducted + Number(r.total_food_deducted),
+      total_net_payable: acc.total_net_payable + Number(r.total_net_payable),
+      total_received: acc.total_received + Number(r.total_received),
+      total_balance: acc.total_balance + Number(r.total_balance),
+    }), {
+      total_bills: 0, total_bill_amount: 0, total_food_deducted: 0,
+      total_net_payable: 0, total_received: 0, total_balance: 0
+    });
+
+    res.json({ success: true, data: rows, totals });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Pending Bills Aging Report
+router.get('/summary/aging', authenticate, authorize('SUPER_ADMIN', 'ADMIN'), async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT 
+        b.id, b.bill_no, b.bill_date, b.period_start, b.period_end,
+        b.net_payable, b.amount_received, b.balance, b.status,
+        s.site_name,
+        DATEDIFF(CURDATE(), b.bill_date) as days_pending,
+        CASE 
+          WHEN DATEDIFF(CURDATE(), b.bill_date) <= 15 THEN '0-15 days'
+          WHEN DATEDIFF(CURDATE(), b.bill_date) <= 30 THEN '15-30 days'
+          WHEN DATEDIFF(CURDATE(), b.bill_date) <= 60 THEN '30-60 days'
+          ELSE '60+ days'
+        END as aging_bucket
+      FROM bills b
+      JOIN sites s ON b.site_id = s.id
+      WHERE b.status IN ('PENDING', 'PARTIAL') AND b.balance > 0
+      ORDER BY days_pending DESC
+    `);
+
+    // Aging summary
+    const buckets = {
+      '0-15 days': { count: 0, amount: 0 },
+      '15-30 days': { count: 0, amount: 0 },
+      '30-60 days': { count: 0, amount: 0 },
+      '60+ days': { count: 0, amount: 0 }
+    };
+    
+    rows.forEach(r => {
+      const b = r.aging_bucket;
+      if (buckets[b]) {
+        buckets[b].count += 1;
+        buckets[b].amount += Number(r.balance);
+      }
+    });
+
+    res.json({ success: true, data: rows, buckets });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;
