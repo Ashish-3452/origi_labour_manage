@@ -20,7 +20,7 @@ const errorHandler = require('./middleware/errorHandler');
 const Otp = require('./models/Otp');
 const LabourSiteRate = require('./models/LabourSiteRate');
 const SiteCategoryRate = require('./models/SiteCategoryRate');
-const ActivityLog = require('./models/ActivityLog');
+
 const FoodAdvance = require('./models/FoodAdvance');
 const Bill = require('./models/Bill');
 const BillPayment = require('./models/BillPayment');
