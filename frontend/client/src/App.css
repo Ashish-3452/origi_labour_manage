@@ -731,3 +731,27 @@ textarea {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+/* ========================================
+   FIX - Stats Cards Mobile Overflow
+   ======================================== */
+@media (max-width: 768px) {
+  /* Main content area must respect width */
+  main.MuiBox-root,
+  .MuiBox-root[component="main"] {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+  
+  /* Grid container - proper spacing */
+  .MuiGrid-container {
+    width: calc(100% + 16px) !important;
+    margin-left: -8px !important;
+    margin-right: -8px !important;
+  }
+  
+  /* Grid items - proper padding */
+  .MuiGrid-item {
+    padding: 6px !important;
+  }
+}

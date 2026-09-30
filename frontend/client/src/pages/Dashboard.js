@@ -391,9 +391,9 @@ const Dashboard = () => {
           mt: 8
         }}
       >
-        <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
-          {statsCards.map((stat, index) => (
-            <Grid item xs={6} sm={4} md={3} key={index}>
+        <Grid container spacing={{ xs: 1.5, sm: 2, md: 2 }}>
+  {statsCards.map((stat, index) => (
+    <Grid item xs={index === 4 ? 12 : 6} sm={6} md={index === 4 ? 6 : 3} key={index}>
               <Card sx={{
                 borderRadius: 3,
                 boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
