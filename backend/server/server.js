@@ -20,7 +20,10 @@ const errorHandler = require('./middleware/errorHandler');
 const Otp = require('./models/Otp');
 const LabourSiteRate = require('./models/LabourSiteRate');
 const SiteCategoryRate = require('./models/SiteCategoryRate');
-
+const ActivityLog = require('./models/ActivityLog');
+const FoodAdvance = require('./models/FoodAdvance');
+const Bill = require('./models/Bill');
+const BillPayment = require('./models/BillPayment');
 // Load environment variables
 dotenv.config();
 
@@ -77,7 +80,9 @@ app.use('/api/bill', require('./routes/billRoutes'));
 app.use('/api/theka', require('./routes/thekaRoutes'));
 app.use('/api/activity', require('./routes/activityRoutes'));
 app.use('/api/otp', require('./routes/otpRoutes'));
-
+app.use('/api/activity', require('./routes/activityRoutes'));
+app.use('/api/food-advance', require('./routes/foodAdvanceRoutes'));
+app.use('/api/bills', require('./routes/billManagementRoutes'));
 
 // Frontend fallback (SPA)
 app.use((req, res) => {
@@ -109,7 +114,16 @@ const startServer = async () => {
       await Otp.createTable();
       await LabourSiteRate.createTable();
       await SiteCategoryRate.createTable();
-      
+      await ActivityLog.createTable();
+console.log('  ✅ Activity Log table');
+await FoodAdvance.createTable();
+console.log('  ✅ Food Advances table');
+
+await Bill.createTable();
+console.log('  ✅ Bills table');
+
+await BillPayment.createTable();
+console.log('  ✅ Bill Payments table');
 
       
       console.log('📦 Inserting default data...');

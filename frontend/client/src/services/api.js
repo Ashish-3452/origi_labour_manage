@@ -64,4 +64,25 @@ export const paymentAPI = {
   getLabourHistory: (labourId) => api.get(`/payments/history/${labourId}`),
 };
 
+// Food Advance APIs
+export const foodAdvanceAPI = {
+  create: (data) => api.post('/food-advance/create', data),
+  getAll: (filters) => api.get('/food-advance/list', { params: filters }),
+  getTotal: (site_id, from_date, to_date) => 
+    api.get('/food-advance/total', { params: { site_id, from_date, to_date } }),
+  update: (id, data) => api.put(`/food-advance/update/${id}`, data),
+  delete: (id) => api.delete(`/food-advance/delete/${id}`),
+};
+
+// Bill Management APIs
+export const billAPI = {
+  create: (data) => api.post('/bills/create', data),
+  getAll: (filters) => api.get('/bills/list', { params: filters }),
+  getById: (id) => api.get(`/bills/${id}`),
+  calculateDeduction: (site_id, period_start, period_end) =>
+    api.get('/bills/calculate-deduction', { params: { site_id, period_start, period_end } }),
+  addPayment: (id, data) => api.post(`/bills/${id}/payment`, data),
+  delete: (id) => api.delete(`/bills/${id}`),
+};
+
 export default api;

@@ -23,6 +23,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import LabourSiteRates from './pages/LabourSiteRates';
 import AttendanceReport from './pages/AttendanceReport';
 import AdvanceHistory from './pages/AdvanceHistory';
+import FoodAdvance from './pages/FoodAdvance';
+import BillManagement from './pages/BillManagement';
 import './App.css';
 
 
@@ -185,6 +187,19 @@ function App() {
     <AdvanceHistory />
   </ProtectedRoute>
 } />
+
+<Route path="/food-advance" element={
+  <ProtectedRoute>
+    <FoodAdvance />
+  </ProtectedRoute>
+} />
+
+<Route path="/bill-management" element={
+  <ProtectedRoute>
+    <BillManagement />
+  </ProtectedRoute>
+} />
+
 
           {/* Catch-all - should be last */}
           <Route path="*" element={<Navigate to="/" replace />} />

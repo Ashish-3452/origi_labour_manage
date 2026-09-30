@@ -9,7 +9,7 @@ import {
   Dashboard as DashboardIcon, People, TrendingDown, Assignment, Payment,
   Restaurant, Settings, Menu as MenuIcon,
   Logout, Notifications, TrendingUp, Business, PersonAdd, Calculate, PictureAsPdf,
-  SupervisorAccount, Category, History, Assessment,Refresh
+  SupervisorAccount, Category, History, Assessment,Refresh,Receipt
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -151,6 +151,8 @@ const Dashboard = () => {
     { text: 'Attendance Report', icon: <Assessment />, path: '/attendance/report' },
     { text: 'Users', icon: <People />, path: '/users' },
     { text: 'Advance History', icon: <History />, path: '/payments/history' },
+    { text: 'Food Advance', icon: <Restaurant />, path: '/food-advance' },
+    { text: 'Bill Management', icon: <Receipt />, path: '/bill-management' },
     { text: 'Activity Log', icon: <History />, path: '/activity' },
     { text: 'Settings', icon: <Settings />, path: '/settings' },
   ];
