@@ -1,5 +1,79 @@
-/* ============ GLOBAL RESET ============ */
-* {
+/* ==========================================================
+   LABOURBHAI - MASTER CSS
+   Version: 3.0 | Mobile-First | Designer Edition
+   ========================================================== */
+
+/* ==========================================================
+   1. CSS VARIABLES - Design Tokens
+   ========================================================== */
+:root {
+  /* Brand Colors */
+  --primary: #1a237e;
+  --primary-light: #534bae;
+  --primary-dark: #000051;
+  --secondary: #ff6f00;
+  --success: #2e7d32;
+  --success-light: #4caf50;
+  --warning: #f57c00;
+  --error: #c62828;
+  --error-light: #f44336;
+  --info: #0288d1;
+
+  /* Neutrals */
+  --bg-default: #f0f2f5;
+  --bg-paper: #ffffff;
+  --bg-alt: #f8f9fa;
+  --border-light: #e0e0e0;
+  --text-primary: #212121;
+  --text-secondary: #616161;
+  --text-hint: #9e9e9e;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  --gradient-sidebar: linear-gradient(180deg, #1a237e 0%, #0d47a1 100%);
+  --gradient-card: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --shadow-xl: 0 12px 40px rgba(0,0,0,0.16);
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* Layout */
+  --drawer-width: 280px;
+  --appbar-height: 64px;
+
+  /* Safe Area (for notched phones) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* ==========================================================
+   2. GLOBAL RESET
+   ========================================================== */
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -7,155 +81,246 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  width: 100%;
+  overflow-x: hidden;
+  background: var(--bg-default);
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
 }
 
 body {
   font-family: 'Roboto', 'Arial', sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f0f2f5;
+  text-rendering: optimizeLegibility;
 }
 
-/* ============ SCROLLBAR ============ */
+/* Prevent iOS zoom on inputs */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+/* ==========================================================
+   3. SCROLLBAR
+   ========================================================== */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  width: 8px;
+  height: 8px;
 }
 
-/* ============ ANIMATIONS ============ */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999;
+  background-clip: content-box;
+}
+
+/* ==========================================================
+   4. ANIMATIONS
+   ========================================================== */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
-@keyframes slideIn {
+
+@keyframes slideInLeft {
   from { opacity: 0; transform: translateX(-20px); }
   to { opacity: 1; transform: translateX(0); }
 }
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes pulse {
-  0% { transform: scale(1); }
+  0%, 100% { transform: scale(1); }
   50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-.fade-in {
-  animation: fadeIn 0.5s ease-in-out;
-}
-.slide-in {
-  animation: slideIn 0.4s ease-in-out;
 }
 
-/* ============ CARD STYLES ============ */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+/* Utility Classes */
+.fade-in { animation: fadeIn 0.4s ease-out both; }
+.slide-in-left { animation: slideInLeft 0.35s ease-out both; }
+.slide-in-up { animation: slideInUp 0.35s ease-out both; }
+.spin { animation: spin 1s linear infinite; }
+
+/* ==========================================================
+   5. CARD ENHANCEMENTS
+   ========================================================== */
 .MuiCard-root {
-  border-radius: 12px !important;
-  transition: all 0.3s ease;
-}
-.MuiCard-root:hover {
-  box-shadow: 0 8px 30px rgba(0,0,0,0.12) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: box-shadow var(--transition-normal), transform var(--transition-normal) !important;
+  overflow: hidden;
 }
 
-/* ============ BUTTON STYLES ============ */
+.MuiCard-root:hover {
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Only interactive cards get lift effect */
+.MuiCard-root[data-interactive="true"]:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* ==========================================================
+   6. BUTTON ENHANCEMENTS
+   ========================================================== */
 .MuiButton-root {
-  border-radius: 8px !important;
+  border-radius: var(--radius-md) !important;
   text-transform: none !important;
   font-weight: 600 !important;
+  letter-spacing: 0.02em;
+  transition: all var(--transition-fast);
 }
 
-/* ============ INPUT STYLES ============ */
+.MuiButton-contained {
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.MuiButton-contained:hover {
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* ==========================================================
+   7. INPUT ENHANCEMENTS
+   ========================================================== */
 .MuiOutlinedInput-root {
-  border-radius: 8px !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-paper);
+  transition: box-shadow var(--transition-fast);
 }
 
-/* ============ TABLE STYLES ============ */
+.MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.08);
+}
+
+.MuiInputLabel-root {
+  font-weight: 500 !important;
+}
+
+/* ==========================================================
+   8. TABLE ENHANCEMENTS
+   ========================================================== */
 .MuiTableContainer-root {
-  border-radius: 12px !important;
+  border-radius: var(--radius-md) !important;
   overflow-x: auto !important;
-}
-.MuiTableCell-root {
-  font-size: 0.875rem !important;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* ============ DRAWER STYLES ============ */
+.MuiTableHead-root .MuiTableCell-root {
+  background: var(--bg-alt) !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 2px solid var(--border-light) !important;
+}
+
+.MuiTableBody-root .MuiTableRow-root {
+  transition: background-color var(--transition-fast);
+}
+
+.MuiTableBody-root .MuiTableRow-root:hover {
+  background: rgba(26, 35, 126, 0.04) !important;
+}
+
+/* ==========================================================
+   9. DRAWER (Sidebar)
+   ========================================================== */
 .MuiDrawer-paper {
-  background: #1a237e !important;
+  background: var(--gradient-sidebar) !important;
   color: white !important;
+  border-right: none !important;
+  box-shadow: var(--shadow-lg) !important;
 }
 
-/* ============ ALERT STYLES ============ */
+/* ==========================================================
+   10. APPBAR
+   ========================================================== */
+.MuiAppBar-root {
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+/* ==========================================================
+   11. DIALOG ENHANCEMENTS
+   ========================================================== */
+.MuiDialog-paper {
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-xl) !important;
+}
+
+.MuiDialogTitle-root {
+  border-bottom: 1px solid var(--border-light);
+  padding: 16px 24px !important;
+  font-weight: 700 !important;
+}
+
+.MuiDialogActions-root {
+  border-top: 1px solid var(--border-light);
+  padding: 12px 20px !important;
+}
+
+/* ==========================================================
+   12. ALERT ENHANCEMENTS
+   ========================================================== */
 .MuiAlert-root {
-  border-radius: 8px !important;
+  border-radius: var(--radius-md) !important;
+  font-weight: 500;
 }
 
-/* ============ MOBILE RESPONSIVE GLOBAL FIXES ============ */
-@media (max-width: 600px) {
-  /* Touch-friendly buttons */
-  button, .MuiButtonBase-root {
-    min-height: 44px !important;
-    min-width: 44px !important;
-  }
-  
-  /* Prevent iOS zoom on inputs */
-  input, select, textarea, .MuiInputBase-input {
-    font-size: 16px !important;
-  }
-  
-  /* Smaller table cells */
-  .MuiTableCell-root {
-    padding: 6px 4px !important;
-    font-size: 0.75rem !important;
-  }
-  
-  /* Full-width cards */
-  .MuiCard-root {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    border-radius: 8px !important;
-  }
-  
-  /* Smaller alerts */
-  .MuiAlert-root {
-    font-size: 0.8rem !important;
-    padding: 6px 12px !important;
-  }
-  
-  /* Dialog full screen */
-  .MuiDialog-paper {
-    margin: 8px !important;
-    max-height: calc(100% - 16px) !important;
-  }
-  
-  /* Drawer full height */
-  .MuiDrawer-paper {
-    width: 280px !important;
-  }
+/* ==========================================================
+   13. CHIP ENHANCEMENTS
+   ========================================================== */
+.MuiChip-root {
+  font-weight: 600 !important;
+  border-radius: var(--radius-sm) !important;
 }
 
-/* ============ PRINT STYLES ============ */
-@media print {
-  .MuiDrawer-root, .MuiAppBar-root { 
-    display: none !important; 
-  }
-  .MuiBox-root main { 
-    margin-left: 0 !important; 
-    width: 100% !important; 
-  }
-}
-
-/* ============ TOP DUES STEP SLIDER ============ */
+/* ==========================================================
+   14. TOP DUES AUTO SLIDER
+   ========================================================== */
 .dues-slider-container {
   position: relative;
   overflow: hidden;
   width: 100%;
-  padding-bottom: 24px;
+  padding: 8px 0 30px 0;
 }
 
 .dues-slider-track {
@@ -165,26 +330,13 @@ body {
 
 .dues-slide-item {
   flex: 0 0 100%;
-  padding: 0 4px;
+  padding: 0 6px;
   box-sizing: border-box;
 }
 
-@media (min-width: 600px) {
-  .dues-slide-item {
-    flex: 0 0 50%;
-  }
-}
-
-@media (min-width: 900px) {
-  .dues-slide-item {
-    flex: 0 0 33.333%;
-  }
-}
-
-/* Dots below slider */
 .dues-dots {
   position: absolute;
-  bottom: 4px;
+  bottom: 6px;
   left: 0;
   right: 0;
   display: flex;
@@ -196,553 +348,386 @@ body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #ccc;
-  transition: all 0.3s ease;
+  background: #cfcfcf;
+  transition: all var(--transition-normal);
   cursor: pointer;
+  border: none;
+  padding: 0;
 }
 
 .dues-dot.active {
-  background: #1a237e;
-  width: 22px;
+  background: var(--primary);
+  width: 24px;
   border-radius: 4px;
 }
-/* Refresh button spin animation */
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
 
-/* ========================================
-   MOBILE POLISH - ENHANCED
-   ======================================== */
-
-/* Prevent body scroll when drawer open */
-body.drawer-open {
-  overflow: hidden;
-}
-
-/* Mobile Table Improvements */
-@media (max-width: 768px) {
-  /* Tables scroll horizontally */
-  .MuiTableContainer-root {
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* Compact table cells */
-  .MuiTableCell-root {
-    white-space: nowrap;
-    padding: 8px 6px !important;
-    font-size: 0.75rem !important;
-  }
-  
-  /* Sticky first column for tables */
-  .MuiTableCell-root:first-child {
-    position: sticky;
-    left: 0;
-    background: white;
-    z-index: 2;
-  }
-  
-  /* Dialog full screen on mobile */
-  .MuiDialog-paper {
-    margin: 0 !important;
-    max-height: 100vh !important;
-    height: 100vh !important;
-    max-width: 100% !important;
-    border-radius: 0 !important;
-  }
-  
-  /* Form inputs full width */
-  .MuiTextField-root {
-    width: 100% !important;
-  }
-  
-  /* Buttons in dialogs side by side */
-  .MuiDialogActions-root {
-    padding: 12px !important;
-  }
-  .MuiDialogActions-root .MuiButton-root {
-    flex: 1;
-  }
-  
-  /* Cards stack */
-  .MuiGrid-container {
-    margin: 0 !important;
-  }
-  
-  /* Paper padding */
-  .MuiPaper-root {
-    padding: 12px !important;
-  }
-  
-  /* Sidebar drawer width */
-  .MuiDrawer-paper {
-    width: 85vw !important;
-    max-width: 320px;
-  }
-  
-  /* Chips smaller */
-  .MuiChip-root {
-    height: 22px !important;
-    font-size: 0.7rem !important;
-  }
-  
-  /* Icons in buttons */
-  .MuiButton-startIcon {
-    margin-right: 4px !important;
+/* Tablet */
+@media (min-width: 600px) {
+  .dues-slide-item {
+    flex: 0 0 50%;
   }
 }
 
-/* Very small screens (iPhone SE, etc) */
-@media (max-width: 375px) {
-  .MuiTableCell-root {
-    padding: 6px 4px !important;
-    font-size: 0.7rem !important;
-  }
-  
-  h5 {
-    font-size: 1.1rem !important;
-  }
-  
-  h6 {
-    font-size: 1rem !important;
+/* Desktop */
+@media (min-width: 900px) {
+  .dues-slide-item {
+    flex: 0 0 33.333%;
   }
 }
 
-/* Touch-friendly tap targets */
-@media (hover: none) and (pointer: coarse) {
-  .MuiIconButton-root {
-    padding: 10px !important;
-  }
-  
-  .MuiListItem-root {
-    min-height: 48px !important;
-  }
+/* ==========================================================
+   15. LOADING SKELETON
+   ========================================================== */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: var(--radius-sm);
 }
 
-/* Landscape mode adjustments */
-@media (max-width: 900px) and (orientation: landscape) {
-  .MuiDrawer-paper {
-    width: 240px !important;
+/* ==========================================================
+   16. MOBILE RESPONSIVE - TABLET & PHONE
+   ========================================================== */
+@media (max-width: 900px) {
+  :root {
+    --drawer-width: 260px;
   }
-}
-
-
-/* ========================================
-   PREVENT HORIZONTAL SCROLL ON MOBILE
-   ======================================== */
-
-html, body {
-  overflow-x: hidden;
-  max-width: 100vw;
-  width: 100%;
-}
-
-#root {
-  overflow-x: hidden;
-  width: 100%;
 }
 
 @media (max-width: 768px) {
-  /* Force prevent horizontal scroll */
-  body {
-    position: relative;
-    overflow-x: hidden !important;
-  }
-  
-  /* All containers respect viewport */
-  .MuiContainer-root,
-  .MuiBox-root,
-  .MuiPaper-root,
-  .MuiGrid-root {
-    max-width: 100vw !important;
-    overflow-x: hidden;
-  }
-  
-  /* Tables can scroll horizontally WITHIN their container */
-  .MuiTableContainer-root {
-    overflow-x: auto !important;
-    max-width: 100% !important;
-  }
-  
-  /* Prevent text overflow */
-  .MuiTypography-root {
-    word-break: break-word;
-    overflow-wrap: break-word;
-  }
-  
-  /* Prevent images from overflowing */
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-  
-  /* Prevent long numbers/text from stretching */
-  .MuiTableCell-root {
-    max-width: 150px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  /* Menu/Dialog respect viewport */
-  .MuiMenu-paper,
-  .MuiDialog-paper {
-    max-width: 95vw !important;
-  }
-  
-  /* Chips don't overflow */
-  .MuiChip-root {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-/* ========================================
-   MOBILE POLISH - COMPLETE ENHANCEMENT
-   ======================================== */
-
-/* Prevent horizontal scroll */
-html, body, #root {
-  overflow-x: hidden;
-  max-width: 100vw;
-  width: 100%;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* ========================================
-   MOBILE (max-width 768px)
-   ======================================== */
-@media (max-width: 768px) {
-  
-  /* ---- GLOBAL ---- */
+  /* Global body */
   body {
     font-size: 14px;
   }
-  
-  /* ---- CONTAINER ---- */
+
+  /* Container padding */
   .MuiContainer-root {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
+    padding-left: var(--space-sm) !important;
+    padding-right: var(--space-sm) !important;
   }
-  
-  .MuiPaper-root {
-    border-radius: 12px !important;
-  }
-  
-  /* ---- CARDS ---- */
+
+  /* Cards */
   .MuiCard-root {
-    border-radius: 12px !important;
-    margin-bottom: 8px;
+    border-radius: var(--radius-md) !important;
   }
-  
+
   .MuiCardContent-root {
-    padding: 12px !important;
+    padding: 14px !important;
   }
-  
+
   .MuiCardContent-root:last-child {
-    padding-bottom: 12px !important;
+    padding-bottom: 14px !important;
   }
-  
-  /* ---- TABLES ---- */
+
+  /* Tables - horizontal scroll only when needed */
   .MuiTableContainer-root {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 8px;
-    max-width: calc(100vw - 32px);
+    border-radius: var(--radius-sm) !important;
+    max-width: 100%;
   }
-  
-  .MuiTable-root {
-    min-width: 600px; /* Force horizontal scroll if needed */
-  }
-  
+
   .MuiTableCell-root {
-    padding: 8px 6px !important;
-    font-size: 0.75rem !important;
+    padding: 10px 8px !important;
+    font-size: 0.8rem !important;
     white-space: nowrap;
   }
-  
-  .MuiTableCell-head {
+
+  .MuiTableHead-root .MuiTableCell-root {
     font-size: 0.7rem !important;
-    font-weight: 700 !important;
-    background-color: #f5f5f5;
+    padding: 8px 6px !important;
   }
-  
-  /* ---- BUTTONS ---- */
+
+  /* Buttons - touch friendly */
   .MuiButton-root {
-    font-size: 0.8rem !important;
-    padding: 8px 12px !important;
-    min-height: 40px !important;
-    text-transform: none !important;
-  }
-  
-  .MuiButton-startIcon {
-    margin-right: 4px !important;
-  }
-  
-  .MuiButton-startIcon > *:nth-of-type(1) {
-    font-size: 1rem !important;
-  }
-  
-  /* ---- ICON BUTTONS (bigger tap targets) ---- */
-  .MuiIconButton-root {
-    padding: 8px !important;
-  }
-  
-  .MuiIconButton-sizeSmall {
-    padding: 6px !important;
-  }
-  
-  /* ---- INPUTS ---- */
-  .MuiTextField-root,
-  .MuiOutlinedInput-root {
-    font-size: 16px !important; /* Prevent iOS zoom */
-  }
-  
-  .MuiInputBase-input {
-    font-size: 16px !important; /* Prevent iOS zoom */
-    padding: 12px 10px !important;
-  }
-  
-  .MuiInputLabel-root {
+    min-height: 42px;
+    padding: 10px 14px !important;
     font-size: 0.85rem !important;
   }
-  
-  /* ---- DIALOGS (fullscreen on mobile) ---- */
+
+  .MuiIconButton-root {
+    padding: 10px !important;
+  }
+
+  .MuiIconButton-sizeSmall {
+    padding: 8px !important;
+  }
+
+  /* Inputs */
+  .MuiInputBase-input {
+    padding: 12px 12px !important;
+  }
+
+  .MuiInputLabel-root {
+    font-size: 0.9rem !important;
+  }
+
+  /* Dialogs - fullscreen on mobile */
   .MuiDialog-paper {
     margin: 0 !important;
     max-width: 100vw !important;
     width: 100vw !important;
+    height: 100vh !important;
     max-height: 100vh !important;
-    height: auto !important;
     border-radius: 0 !important;
   }
-  
-  .MuiDialog-paperFullWidth {
-    width: 100vw !important;
-  }
-  
+
   .MuiDialogTitle-root {
-    padding: 12px 16px !important;
-    font-size: 1.1rem !important;
+    padding: 14px 16px !important;
+    font-size: 1.05rem !important;
   }
-  
+
   .MuiDialogContent-root {
-    padding: 12px 16px !important;
+    padding: 14px 16px !important;
   }
-  
+
   .MuiDialogActions-root {
     padding: 12px 16px !important;
     gap: 8px;
+    border-top: 1px solid var(--border-light);
+    position: sticky;
+    bottom: 0;
+    background: white;
   }
-  
+
   .MuiDialogActions-root .MuiButton-root {
     flex: 1;
-    margin: 0 !important;
   }
-  
-  /* ---- ALERTS ---- */
+
+  /* Alerts */
   .MuiAlert-root {
-    font-size: 0.8rem !important;
-    padding: 6px 12px !important;
-    margin-bottom: 8px !important;
-    border-radius: 8px !important;
+    font-size: 0.85rem !important;
+    padding: 10px 12px !important;
+    border-radius: var(--radius-sm) !important;
   }
-  
-  /* ---- CHIPS ---- */
+
+  /* Chips */
   .MuiChip-root {
-    height: 22px !important;
-    font-size: 0.7rem !important;
+    height: 24px !important;
+    font-size: 0.72rem !important;
   }
-  
-  .MuiChip-label {
-    padding: 0 8px !important;
+
+  /* Typography */
+  .MuiTypography-h4 {
+    font-size: 1.35rem !important;
+    line-height: 1.3 !important;
   }
-  
-  /* ---- TYPOGRAPHY ---- */
+
   .MuiTypography-h5 {
     font-size: 1.15rem !important;
+    line-height: 1.35 !important;
   }
-  
+
   .MuiTypography-h6 {
-    font-size: 1rem !important;
+    font-size: 1.02rem !important;
+    line-height: 1.4 !important;
   }
-  
-  .MuiTypography-body1 {
-    font-size: 0.9rem !important;
-  }
-  
-  .MuiTypography-body2 {
-    font-size: 0.8rem !important;
-  }
-  
-  .MuiTypography-caption {
-    font-size: 0.7rem !important;
-  }
-  
-  /* ---- TABS ---- */
+
+  /* Tabs */
   .MuiTabs-root {
-    min-height: 40px !important;
+    min-height: 42px !important;
   }
-  
+
   .MuiTab-root {
-    font-size: 0.75rem !important;
-    min-height: 40px !important;
-    padding: 6px 12px !important;
+    min-height: 42px !important;
+    padding: 8px 14px !important;
+    font-size: 0.8rem !important;
     min-width: auto !important;
-    text-transform: none !important;
   }
-  
-  /* ---- LISTS ---- */
+
+  /* Lists (sidebar menu) */
   .MuiListItem-root {
-    padding: 8px 12px !important;
-    min-height: 44px !important;
+    padding: 10px 14px !important;
+    min-height: 46px !important;
   }
-  
+
   .MuiListItemIcon-root {
     min-width: 36px !important;
   }
-  
-  /* ---- DRAWER ---- */
+
+  /* Drawer */
   .MuiDrawer-paper {
-    width: 85vw !important;
-    max-width: 320px !important;
+    width: 82vw !important;
+    max-width: 300px !important;
   }
-  
-  /* ---- MENU (dropdowns) ---- */
+
+  /* Menu dropdowns */
   .MuiMenu-paper {
-    max-width: 90vw !important;
+    max-width: 92vw !important;
+    border-radius: var(--radius-md) !important;
   }
-  
+
   .MuiMenuItem-root {
-    font-size: 0.85rem !important;
-    padding: 10px 16px !important;
+    padding: 12px 16px !important;
     min-height: 44px !important;
+    font-size: 0.88rem !important;
   }
-  
-  /* ---- GRID ---- */
-  .MuiGrid-container {
-    width: 100% !important;
-    margin: 0 !important;
-  }
-  
-  .MuiGrid-item {
-    padding: 4px !important;
-  }
-  
-  /* ---- APPBAR ---- */
-  .MuiAppBar-root {
-    box-shadow: 0 1px 6px rgba(0,0,0,0.1) !important;
-  }
-  
+
+  /* AppBar */
   .MuiToolbar-root {
-    min-height: 56px !important;
+    min-height: 58px !important;
     padding: 0 8px !important;
   }
-  
-  /* ---- SPECIFIC: Top 10 Dues Slider ---- */
-  .dues-slider-container {
-    padding: 8px 0 28px 0 !important;
-  }
-  
+
+  /* Dues slider mobile */
   .dues-slide-item {
-    flex: 0 0 85% !important;
-    padding: 0 6px !important;
+    flex: 0 0 88%;
+    padding: 0 6px;
   }
-  
-  /* ---- SPECIFIC: Pending Finalization table ---- */
-  .pending-table-wrapper {
-    border-radius: 8px;
-    overflow: hidden;
+
+  /* Scrollbar thinner */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
   }
 }
 
-/* ========================================
-   VERY SMALL SCREENS (max-width 375px)
-   ======================================== */
-@media (max-width: 375px) {
-  .MuiTableCell-root {
-    padding: 6px 4px !important;
-    font-size: 0.7rem !important;
+/* ==========================================================
+   17. SMALL PHONES (<= 400px)
+   ========================================================== */
+@media (max-width: 400px) {
+  body {
+    font-size: 13.5px;
   }
-  
+
   .MuiTypography-h5 {
-    font-size: 1rem !important;
+    font-size: 1.05rem !important;
   }
-  
+
   .MuiTypography-h6 {
-    font-size: 0.9rem !important;
+    font-size: 0.95rem !important;
   }
-  
+
+  .MuiTableCell-root {
+    padding: 8px 6px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .MuiButton-root {
+    padding: 8px 10px !important;
+    font-size: 0.8rem !important;
+  }
+
   .dues-slide-item {
-    flex: 0 0 90% !important;
+    flex: 0 0 92%;
   }
 }
 
-/* ========================================
-   TOUCH DEVICES (hover: none)
-   ======================================== */
+/* ==========================================================
+   18. TABLET (768px - 1024px)
+   ========================================================== */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .MuiCard-root {
+    border-radius: var(--radius-lg) !important;
+  }
+
+  .MuiTableCell-root {
+    padding: 10px 12px !important;
+  }
+}
+
+/* ==========================================================
+   19. TOUCH DEVICE OPTIMIZATIONS
+   ========================================================== */
 @media (hover: none) and (pointer: coarse) {
-  /* Remove hover effects on touch */
-  .MuiCard-root:hover {
-    transform: none !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+  /* Remove hover lift on touch */
+  .MuiCard-root[data-interactive="true"]:hover {
+    transform: none;
   }
-  
-  .MuiButton-root:hover {
-    transform: none !important;
-  }
-  
-  /* Active state for buttons */
-  .MuiButton-root:active {
-    transform: scale(0.97);
-    transition: transform 0.1s;
-  }
-  
-  /* Icon buttons active */
+
+  /* Active press feedback */
+  .MuiButton-root:active,
   .MuiIconButton-root:active {
-    background-color: rgba(0,0,0,0.08) !important;
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+
+  .MuiListItem-root:active {
+    background: rgba(255, 255, 255, 0.12) !important;
   }
 }
 
-/* ========================================
-   LANDSCAPE MODE
-   ======================================== */
+/* ==========================================================
+   20. LANDSCAPE MOBILE
+   ========================================================== */
 @media (max-width: 900px) and (orientation: landscape) {
   .MuiDrawer-paper {
     width: 240px !important;
   }
+
+  .MuiToolbar-root {
+    min-height: 52px !important;
+  }
 }
 
-/* ========================================
-   PRINT STYLES
-   ======================================== */
+/* ==========================================================
+   21. PWA SAFE AREA (iPhone Notch)
+   ========================================================== */
+@supports (padding: env(safe-area-inset-top)) {
+  .MuiAppBar-root {
+    padding-top: var(--safe-top);
+  }
+
+  .MuiDrawer-paper {
+    padding-left: var(--safe-left);
+    padding-bottom: var(--safe-bottom);
+  }
+}
+
+/* ==========================================================
+   22. PRINT STYLES
+   ========================================================== */
 @media print {
-  .MuiDrawer-root, .MuiAppBar-root, .MuiIconButton-root {
+  .MuiDrawer-root,
+  .MuiAppBar-root,
+  .MuiIconButton-root,
+  .no-print {
     display: none !important;
   }
-  .MuiBox-root[component="main"] {
+
+  body {
+    background: white !important;
+    font-size: 12px;
+  }
+
+  .MuiCard-root {
+    box-shadow: none !important;
+    border: 1px solid var(--border-light);
+  }
+
+  .print-full-width {
     margin-left: 0 !important;
     width: 100% !important;
     padding: 0 !important;
   }
 }
 
-/* ========================================
-   SCROLLBAR (mobile thin)
-   ======================================== */
-@media (max-width: 768px) {
-  ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #bbb;
-    border-radius: 2px;
-  }
+/* ==========================================================
+   23. UTILITY CLASSES
+   ========================================================== */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-muted { color: var(--text-secondary); }
+.text-error { color: var(--error); }
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning); }
+
+.mt-1 { margin-top: var(--space-sm); }
+.mt-2 { margin-top: var(--space-md); }
+.mt-3 { margin-top: var(--space-lg); }
+
+.mb-1 { margin-bottom: var(--space-sm); }
+.mb-2 { margin-bottom: var(--space-md); }
+.mb-3 { margin-bottom: var(--space-lg); }
+
+.p-1 { padding: var(--space-sm); }
+.p-2 { padding: var(--space-md); }
+.p-3 { padding: var(--space-lg); }
+
+.no-scroll-x {
+  overflow-x: hidden !important;
+  max-width: 100%;
+}
+
+.scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
