@@ -183,7 +183,7 @@ const FoodAdvance = () => {
           <Box sx={{ textAlign: 'center', py: 4 }}><CircularProgress /></Box>
         ) : entries.length > 0 ? (
           <TableContainer sx={{ overflowX: 'auto' }}>
-            <Table size="small">
+            <Table size="small" sx={{ minWidth: { xs: 700, sm: 'auto' } }}>
               <TableHead>
                 <TableRow sx={{ bgcolor: '#f5f5f5' }}>
                   <TableCell>#</TableCell>

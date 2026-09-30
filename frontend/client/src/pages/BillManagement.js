@@ -240,7 +240,7 @@ const BillManagement = () => {
           <Box sx={{ textAlign: 'center', py: 4 }}><CircularProgress /></Box>
         ) : bills.length > 0 ? (
           <TableContainer sx={{ overflowX: 'auto' }}>
-            <Table size="small">
+            <Table size="small" sx={{ minWidth: { xs: 800, sm: 'auto' } }}>
               <TableHead>
                 <TableRow sx={{ bgcolor: '#f5f5f5' }}>
                   <TableCell>Bill No</TableCell>

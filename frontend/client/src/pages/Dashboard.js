@@ -393,7 +393,7 @@ const Dashboard = () => {
       >
         <Grid container spacing={{ xs: 1, sm: 2, md: 3 }}>
           {statsCards.map((stat, index) => (
-            <Grid item xs={6} sm={6} md={3} key={index}>
+            <Grid item xs={6} sm={4} md={3} key={index}>
               <Card sx={{
                 borderRadius: 3,
                 boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
@@ -461,7 +461,7 @@ const Dashboard = () => {
 <Card sx={{ mt: 3, borderRadius: 3, p: { xs: 1, sm: 2, md: 3 }, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
   <Typography variant="h6" fontWeight="bold" mb={2}>🏢 Site-wise Attendance (Today)</Typography>
   <TableContainer sx={{ overflowX: 'auto' }}>
-    <Table size="small">
+    <Table size="small" sx={{ minWidth: { xs: 500, sm: 'auto' } }}>
       <TableHead>
         <TableRow sx={{ bgcolor: '#f5f5f5' }}>
           <TableCell>Site</TableCell>

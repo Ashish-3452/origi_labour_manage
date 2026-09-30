@@ -188,7 +188,7 @@ const BillSummary = () => {
             </Box>
 
             <TableContainer sx={{ overflowX: 'auto' }}>
-              <Table size="small">
+              <Table size="small" sx={{ minWidth: { xs: 700, sm: 'auto' } }}>
                 <TableHead>
                   <TableRow sx={{ bgcolor: '#f5f5f5' }}>
                     <TableCell>Site</TableCell>
@@ -253,7 +253,7 @@ const BillSummary = () => {
             </Grid>
 
             <TableContainer sx={{ overflowX: 'auto' }}>
-              <Table size="small">
+              <Table size="small" sx={{ minWidth: { xs: 700, sm: 'auto' } }}>
                 <TableHead>
                   <TableRow sx={{ bgcolor: '#f5f5f5' }}>
                     <TableCell>Bill No</TableCell>
